@@ -1,74 +1,45 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
-import Header from '../../component/customer/header';
-import Footer from '../../component/customer/footer';
 import CartItem from '../../component/customer/cart-item';
 import CartSummary from '../../component/customer/cart-summary';
+import Footer from '../../component/customer/footer';
+import Header from '../../component/customer/header';
 import useCart from "../../context/cart-context";
 
 export default function Cart() {
     const navigate = useNavigate();
-    const { cartItems, setCartItems, fetchCartItems } = useCart();
-
-    useEffect(() => {
-        fetchCartItems();
-    }, []);
-
-    const updateItemStatus = async (product_id, is_checked) => {
-        try {
-            const token = localStorage.getItem("access_token");
-            const res = await fetch(`http://localhost:8000/carts/${product_id}/status`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ is_checked }),
-            });
-            if (!res.ok) throw new Error("Lỗi cập nhật trạng thái sản phẩm");
-        } catch (err) {
-            console.error(err);
-            alert("Không thể cập nhật trạng thái sản phẩm!");
-            fetchCartItems();
-        }
-    };
-
-    const handleCheckboxAll = () => {
-        const newIsChecked = !cartItems.every(item => item.is_checked);
-        setCartItems(prev =>
-            prev.map(item => ({ ...item, is_checked: newIsChecked }))
-        );
-        cartItems.forEach(item => updateItemStatus(item.product_id, newIsChecked));
-    };
-
-    // const handleCheckboxChange = (product_id, is_checked) => {
-    //     const newIsChecked = !is_checked;
-    //     setCartItems(prev =>
-    //         prev.map(item =>
-    //             item.product_id === product_id
-    //                 ? { ...item, is_checked: newIsChecked }
-    //                 : item
-    //         )
-    //     );
-    //     updateItemStatus(product_id, newIsChecked);
-    // };
+    const { cartItems } = useCart();
 
     const handleCheckOut = async () => {
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            if (cart.length === 0) {
+                alert("Giỏ hàng trống! Vui lòng thêm sản phẩm trước khi thanh toán.");
+                return;
+            }
+
+            const hasCheckedItems = cart.some(item => item.is_checked === true);
+            if (!hasCheckedItems) {
+                alert("Vui lòng chọn ít nhất một sản phẩm để tiến hành thanh toán!");
+                return;
+            }
+
+            localStorage.setItem("post_login_redirect", "/carts");
+            navigate("/login");
+            return;
+        }
+
         if (cartItems.length === 0) {
             alert("Giỏ hàng trống! Vui lòng thêm sản phẩm trước khi thanh toán.");
             return;
         }
+
         const hasCheckedItems = cartItems.some(item => item.is_checked === true);
         if (!hasCheckedItems) {
             alert("Vui lòng chọn ít nhất một sản phẩm để tiến hành thanh toán!");
-            return;
-        }
-
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-            localStorage.setItem("post_login_redirect", "/carts");
-            navigate("/login");
             return;
         }
 
@@ -80,17 +51,21 @@ export default function Cart() {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
             if (!res.ok) {
                 localStorage.setItem("post_login_redirect", "/carts");
                 navigate("/login");
                 return;
             }
+
             navigate("/checkout");
+
         } catch (err) {
             console.error(err);
             alert("Đã xảy ra lỗi. Vui lòng thử lại!");
         }
     };
+
 
     return (
         <div className="bg-white dark:bg-background-dark font-display text-text-color">
@@ -107,22 +82,9 @@ export default function Cart() {
                                 </div>
                                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
                                     <div className="lg:col-span-2 space-y-6">
-                                        <div className="hidden md:grid grid-cols-7 gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 items-center">
-                                            <div className="flex justify-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-5 h-5 accent-[#8b4513] cursor-pointer"
-                                                    checked={cartItems.length > 0 && cartItems.every(item => item.is_checked)}
-                                                    onChange={handleCheckboxAll}
-                                                />
-                                            </div>
-                                            <div className="col-span-3 text-center">Sản phẩm</div>
-                                            <div className="text-center">Giá</div>
-                                            <div className="text-center">Số lượng</div>
-                                            <div className="text-center">Tổng cộng</div>
-                                        </div>
 
-                                        <CartItem/>
+
+                                        <CartItem />
 
                                         <div className="flex px-4 py-3 justify-start">
                                             <button

@@ -61,6 +61,9 @@ if ($uri === "/carts/current_user" && $method === "GET") {
     exit;
 }
 
-http_response_code(404);
-echo json_encode(["error" => "Route not found"]);
-exit;
+// Order routes
+if ($uri === "/orders/checkout" && $method === "POST") {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $order->checkout($data);
+    exit;
+}

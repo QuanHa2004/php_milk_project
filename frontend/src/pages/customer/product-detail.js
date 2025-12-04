@@ -56,7 +56,7 @@ export default function ProductDetail() {
                                         </p>
                                         <h2
                                             class="text-[#333333] dark:text-white tracking-light text-[28px] font-bold leading-tight pt-2">
-                                            {product.price.toLocaleString('vi-VN')} VND</h2>
+                                            {Number(product.price).toLocaleString('vi-VN')} VND</h2>
                                         <div class="flex items-center gap-4 mt-6">
                                             <label class="text-[#333333] dark:text-gray-300" for="quantity">Quantity:</label>
                                             <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">

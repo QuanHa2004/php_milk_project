@@ -84,4 +84,11 @@ class Cart
         ]);
         return $stmt->rowCount();
     }
+
+    public static function clearCart($cart_id)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("DELETE FROM cart_item WHERE cart_id = :cart_id AND is_checked = 1");
+        $stmt->execute(['cart_id' => $cart_id]);
+    }
 }

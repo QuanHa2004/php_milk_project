@@ -19,6 +19,11 @@ $auth       = new Controllers\AuthController();
 $category   = new Controllers\Customer\CategoryController();
 $product    = new Controllers\Customer\ProductController();
 $cart       = new Controllers\Customer\CartController();
+$order      = new Controllers\Customer\OrderController();
+$dashboard  = new Controllers\Admin\DashboardController();
 
-require_once __DIR__ . '/../src/Routes/AuthRoutes.php';
-require_once __DIR__ . '/../src/Routes/CustomerRoutes.php';
+require_once __DIR__ . '/../src/Routes/api.php';
+
+http_response_code(404);
+echo json_encode(["error" => "Route not found - Kiểm tra lại đường dẫn hoặc method"]);
+exit;

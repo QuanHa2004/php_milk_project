@@ -16,9 +16,8 @@ class Product {
                 p.product_name,
                 p.category_id,
                 c.category_name,
-                p.manufacturer_id,
-                m.manufacturer_name,
                 p.price,
+                p.quantity,
                 p.discount_percent,
                 p.image_url,
                 p.description,
@@ -26,7 +25,6 @@ class Product {
                 p.is_hot
             FROM product p
             LEFT JOIN category c ON p.category_id = c.category_id
-            LEFT JOIN manufacturer m ON p.manufacturer_id = m.manufacturer_id
             WHERE p.is_deleted = 0
             ORDER BY p.product_id DESC
         ";
@@ -45,6 +43,7 @@ class Product {
                 p.category_id,
                 c.category_name,
                 p.price,
+                p.quantity,
                 p.discount_percent,
                 p.image_url,
                 p.description,
@@ -73,8 +72,20 @@ class Product {
     public static function searchByName($search_name)
     {
         $db = Connection::get();
-        $stmt = $db->prepare("SELECT product_id, product_name, category_id, manufacturer_id, price, discount_percent, image_url, description FROM product WHERE product_name LIKE :search_name");
+        $stmt = $db->prepare("SELECT product_id, product_name, category_id, price, discount_percent, image_url, description FROM product WHERE product_name LIKE :search_name");
         $stmt->execute(['search_name' => "%$search_name%"]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function decreaseStock($product_id, $quantity)
+    {
+        $db = Connection::get();
+        $sql = "UPDATE product SET quantity = quantity - :quantity WHERE product_id = :product_id AND quantity >= :quantity";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            'quantity' => $quantity,
+            'product_id' => $product_id
+        ]);
+        return $stmt->rowCount() > 0;
     }
 }

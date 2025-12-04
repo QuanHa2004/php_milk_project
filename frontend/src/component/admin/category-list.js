@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function CategoryList() {
     const [categoryList, setCategoryList] = useState([]);
+    const [productList, setProductList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -31,7 +32,35 @@ export default function CategoryList() {
 
         fetchData();
     }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch("http://localhost:8000/admin/products");
 
+                if (!res.ok) {
+                    throw new Error("Lỗi kết nối server");
+                }
+
+                const data = await res.json();
+
+                // kiem tra du lieu tra ve co phai mang hay khong 
+                if (Array.isArray(data)) {
+                    setProductList(data);
+                } else {
+                    setProductList([]);
+                }
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu:", error);
+                setProductList([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+    console.log(categoryList);
+    console.log(productList);
 
     return (
         <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">

@@ -1,26 +1,26 @@
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Login from '../pages/login';
 import Registration from '../pages/registration';
 
 
-import Dashboard from '../pages/admin/dashboard';
-import Order from '../pages/admin/order-management';
-import CategoryManagement from '../pages/admin/category-management';
-import ProductManagement from '../pages/admin/product-management';
-import PromotionManagement from '../pages/admin/promotion-management';
-import InvoiceManagement from '../pages/admin/invoice-management';
 import AddCategory from '../pages/admin/add-category';
 import AddProduct from '../pages/admin/add-product';
+import CategoryManagement from '../pages/admin/category-management';
 import CreatePromotion from '../pages/admin/create-promotion';
+import Dashboard from '../pages/admin/dashboard';
+import InvoiceManagement from '../pages/admin/invoice-management';
 import NewInvoice from '../pages/admin/new-invoice';
+import Order from '../pages/admin/order-management';
+import ProductManagement from '../pages/admin/product-management';
+import PromotionManagement from '../pages/admin/promotion-management';
 
 
+import Cart from '../pages/customer/cart';
+import Checkout from '../pages/customer/checkout';
 import Home from '../pages/customer/home';
 import Product from '../pages/customer/product';
 import ProductDetail from '../pages/customer/product-detail';
-import Cart from '../pages/customer/cart';
-import Checkout from '../pages/customer/checkout';
 import SearchResults from '../pages/customer/search-results';
 
 export default function AppRoutes() {

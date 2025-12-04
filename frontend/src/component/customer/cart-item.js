@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import useCart from "../../context/cart-context";
 
 export default function CartItem() {
@@ -8,51 +9,90 @@ export default function CartItem() {
     increase,
     decrease,
     setCartItems,
+    fetchCartItems,
   } = useCart();
 
-  const handleCheckboxChange = async (product_id, is_checked) => {
-    const newIsChecked = !is_checked;
+  const token = localStorage.getItem("access_token");
+  const [checkAll, setCheckAll] = useState(false);
 
-    setCartItems(prev =>
-      prev.map(item =>
-        item.product_id === product_id
-          ? { ...item, is_checked: newIsChecked } 
-          : item
-      )
-    );
+  useEffect(() => {
+    setCheckAll(cartItems.length > 0 && cartItems.every(item => item.is_checked));
+  }, [cartItems]);
 
+  const updateItemStatus = async (product_id, is_checked) => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`http://localhost:8000/carts/${product_id}/status`, {
+
+      if (!token) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        cart = cart.map(item =>
+          item.product_id === product_id
+            ? { ...item, is_checked }
+            : item
+        );
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        setCartItems(cart);
+        return;
+      }
+
+      const res = await fetch(`http://localhost:8000/carts/${product_id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ is_checked: newIsChecked }),
+        body: JSON.stringify({ is_checked }),
       });
 
-      if (!response.ok) {
-        throw new Error("Lỗi cập nhật");
-      }
+      if (!res.ok) throw new Error("Lỗi cập nhật trạng thái sản phẩm");
 
-    } catch (error) {
-      console.error("Lỗi khi cập nhật trạng thái:", error);
+      return await res.json();
 
-      setCartItems(prev =>
-        prev.map(item =>
-          item.product_id === product_id
-            ? { ...item, is_checked: is_checked }
-            : item
-        )
-      );
+    } catch (err) {
+      console.error(err);
       alert("Không thể cập nhật trạng thái sản phẩm!");
+      fetchCartItems();
     }
+  };
+
+  const handleCheckboxAll = () => {
+    const newIsChecked = !cartItems.every(item => item.is_checked);
+    setCartItems(prev =>
+      prev.map(item => ({ ...item, is_checked: newIsChecked }))
+    );
+    cartItems.forEach(item => updateItemStatus(item.product_id, newIsChecked));
+  };
+
+  const handleCheckboxChange = async (product_id, is_checked) => {
+    const newIsChecked = !is_checked;
+    setCartItems(prev =>
+      prev.map(item =>
+        item.product_id === product_id
+          ? { ...item, is_checked: newIsChecked }
+          : item
+      )
+    );
+    updateItemStatus(product_id, newIsChecked);
   };
 
 
   return (
     <>
+      <div className="hidden md:grid grid-cols-7 gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 items-center">
+        <div className="flex justify-center">
+          <input
+            type="checkbox"
+            className="w-5 h-5 accent-[#8b4513] cursor-pointer"
+            checked={checkAll}
+            onChange={handleCheckboxAll}
+          />
+        </div>
+        <div className="col-span-3 text-center">Sản phẩm</div>
+        <div className="text-center">Giá</div>
+        <div className="text-center">Số lượng</div>
+        <div className="text-center">Tổng cộng</div>
+      </div>
       {cartItems.map((product, index) => (
         <div
           key={index}
