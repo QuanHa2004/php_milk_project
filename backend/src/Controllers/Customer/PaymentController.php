@@ -137,7 +137,11 @@ class PaymentController
                     if ($cart) {
                         $orderDetails = Order::getDetails($order_id);
                         foreach ($orderDetails as $detail) {
-                            Cart::removeItem($cart['cart_id'], $detail['product_id']);
+                            Cart::removeItem(
+                                $cart['cart_id'],
+                                $detail['variant_id'],
+                                $detail['batch_id']
+                            );
                         }
                     }
                 }
@@ -156,7 +160,11 @@ class PaymentController
                 // B. Trả hàng về kho
                 $orderDetails = Order::getDetails($order_id);
                 foreach ($orderDetails as $detail) {
-                    Product::increaseStock($detail['product_id'], $detail['quantity']);
+                    Product::increaseStock(
+                        $detail['variant_id'],
+                        $detail['quantity'],
+                        $detail['batch_id']
+                    );
                 }
 
                 // C. Giữ nguyên giỏ hàng

@@ -11,10 +11,11 @@ use Models\Cart;
 
 class AuthController
 {
-    /* ============================================
-       1. TẠO TOKEN (dùng cho login + social login)
-    ============================================ */
-    public function generateToken($userId, $roleId, $email = null)
+     /* ============================================
+         1. TẠO TOKEN (dùng cho login + social login)
+     ============================================ */
+     // Generate a short-lived JWT access token for a user
+     public function generateToken($userId, $roleId, $email = null)
     {
         $payload = [
             'sub'      => $userId,
@@ -28,12 +29,11 @@ class AuthController
     }
 
 
-    /* ============================================
-       2. AUTH TRUYỀN THỐNG (REGISTER + LOGIN)
-    ============================================ */
-
-    // Đăng ký tài khoản
-    public function register($data)
+     /* ============================================
+         2. AUTH TRUYỀN THỐNG (REGISTER + LOGIN)
+     ============================================ */
+     // Register a new user or link a Google account to an existing user
+     public function register($data)
     {
         $db = Connection::get();
 
@@ -106,7 +106,7 @@ class AuthController
         }
     }
 
-    // Đăng nhập tài khoản
+    // Authenticate user and return access/refresh tokens
     public function login($data)
     {
         $db = Connection::get();
@@ -151,19 +151,59 @@ class AuthController
     }
 
 
-    /* ============================================
-       3. GIẢI MÃ TOKEN (Middleware)
-    ============================================ */
-    public function decodeToken()
+    /* 
+    ============================================
+    HELPER: LẤY TOKEN TỪ HEADER AN TOÀN
+    → Hỗ trợ lấy Authorization header trên mọi server
+    ============================================
+    */
+    // Extract bearer token from request headers in a portable way
+    private function getBearerToken() 
     {
-        $headers = getallheaders();
-        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        $headers = null;
 
-        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-            throw new \Exception("Token không được cung cấp");
+        // Lấy từ $_SERVER
+        if (isset($_SERVER['Authorization'])) {
+            $headers = trim($_SERVER["Authorization"]);
+        }
+        else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
+        } 
+        // Lấy từ Apache
+        else if (function_exists('apache_request_headers')) {
+            $requestHeaders = apache_request_headers();
+            $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
+            
+            if (isset($requestHeaders['Authorization'])) {
+                $headers = trim($requestHeaders['Authorization']);
+            }
         }
 
-        $token = $matches[1];
+        // Tách token từ chuỗi "Bearer xxx"
+        if (!empty($headers)) {
+            if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
+    }
+
+
+    /* 
+    ============================================
+    3. GIẢI MÃ TOKEN (Middleware)
+    → Kiểm tra token hợp lệ, hết hạn, decode payload
+    ============================================
+    */
+    // Decode and validate the JWT access token
+    public function decodeToken()
+    {
+        $token = $this->getBearerToken();
+
+        if (!$token) {
+            throw new \Exception("Token không được cung cấp");
+        }
 
         try {
             return JWT::decode($token, new Key(SECRET_KEY, ALGORITHM));
@@ -175,11 +215,12 @@ class AuthController
     }
 
 
-    /* ============================================
-       4. LẤY THÔNG TIN USER (CURRENT + PROFILE)
-    ============================================ */
-
-    // Lấy user từ token
+    /* 
+    ============================================
+    4. LẤY THÔNG TIN USER (CURRENT + PROFILE)
+    ============================================
+    */
+    // Return current user info decoded from token
     public function currentUser()
     {
         $payload = $this->decodeToken();
@@ -205,7 +246,7 @@ class AuthController
         return $user;
     }
 
-    // API trả về thông tin profile
+    // API endpoint: return authenticated user's profile
     public function profile()
     {
         try {

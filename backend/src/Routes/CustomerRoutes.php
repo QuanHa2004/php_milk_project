@@ -1,4 +1,12 @@
 <?php
+/* ============================
+   USER ROUTES
+============================ */
+
+if ($uri === "/users/update" && $method === "POST") {
+    $user->updateUser(json_decode(file_get_contents('php://input'), true));
+    exit;
+}
 
 /* ============================
    CATEGORY ROUTES
@@ -34,6 +42,11 @@ if (preg_match("#^/products/search/(.*)$#", $uri, $matches) && $method === "GET"
     exit;
 }
 
+if ($uri === "/products/calc" && $method === "POST") {
+    $product->calculateVariant(json_decode(file_get_contents("php://input"), true));
+    exit;
+}
+
 
 /* ============================
    CART ROUTES
@@ -44,8 +57,8 @@ if ($uri === "/carts/add" && $method === "POST") {
     exit;
 }
 
-if (preg_match("#^/carts/remove/([0-9]+)$#", $uri, $matches) && $method === "DELETE") {
-    $cart->remove((int)$matches[1]);
+if ($uri === "/carts/remove" && $method === "DELETE") {
+    $cart->remove(json_decode(file_get_contents('php://input'), true));
     exit;
 }
 
@@ -53,7 +66,6 @@ if ($uri === "/carts/update" && $method === "PUT") {
     $cart->update(json_decode(file_get_contents('php://input'), true));
     exit;
 }
-
 if (preg_match('#^/carts/(\d+)/status$#', $uri, $matches) && $method === "PUT") {
     $cart->updateItemStatus((int)$matches[1], json_decode(file_get_contents('php://input'), true));
     exit;
@@ -76,6 +88,11 @@ if ($uri === "/orders/checkout" && $method === "POST") {
 
 if ($uri === "/orders/retry" && $method === "POST") {
     $order->retryPayment(json_decode(file_get_contents('php://input'), true));
+    exit;
+}
+
+if ($uri === "/orders/history" && $method === "GET") {
+    $order->orderHistory();
     exit;
 }
 

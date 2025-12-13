@@ -119,6 +119,13 @@ export default function Header() {
 
               <div className="flex flex-col absolute right-0 mt-2 w-28 bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg py-2 z-50">
                 <button
+                  onClick={() => navigate("/profile")}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                >
+                  Hồ sơ
+                </button>
+
+                <button
                   onClick={handleLogOut}
                   className="w-full text-left px-4 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                 >

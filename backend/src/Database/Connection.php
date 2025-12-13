@@ -9,7 +9,7 @@ class Connection
     // Singleton PDO instance
     private static $instance = null;
 
-    // Lấy kết nối database (chỉ tạo 1 lần)
+    // Return a singleton PDO connection instance
     public static function get()
     {
         if (!self::$instance) {

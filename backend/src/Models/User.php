@@ -89,4 +89,33 @@ class User
 
         return $db->lastInsertId();
     }
+
+    /* 5. Cập nhật thông tin user (full_name, phone, address, avatar) */
+    public static function updateUser($user_id, $data)
+    {
+        $db = Connection::get();
+
+        if (empty($data)) return false;
+
+        $fields = [];
+        $params = [];
+
+        foreach ($data as $key => $value) {
+            $allowed = ["full_name", "phone", "address", "avatar_url"];
+            if (!in_array($key, $allowed)) continue;
+
+            $fields[] = "$key = ?";
+            $params[] = $value;
+        }
+
+        if (empty($fields)) return false;
+
+        $params[] = $user_id;
+
+        $sql = "UPDATE user SET " . implode(", ", $fields) . " WHERE user_id = ?";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->rowCount();
+    }
 }

@@ -4,18 +4,18 @@ export default function Explore() {
   // Danh sách các danh mục hiển thị trên trang
   const categories = [
     {
-      title: "SỮA TƯƠI",
-      imageUrl: "https://th.bing.com/th/id/OSK.HEROYeXAVJkpUhbzwfZSLTVavNxcuAiBlYC11vqRLgZ8NqQ?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3",
+      title: "SỮA HẠT",
+      imageUrl: "/images/sua-hat.png",
       link: "/categories/1/products",
     },
     {
-      title: "PHÔ MAI",
-      imageUrl: "https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg",
+      title: "SỮA ĐẶC",
+      imageUrl: "/images/sua-dac.png",
       link: "/categories/2/products",
     },
     {
-      title: "YOGURT",
-      imageUrl: "https://images.pexels.com/photos/5945660/pexels-photo-5945660.jpeg",
+      title: "SỮA CHUA",
+      imageUrl: "/images/sua-chua.png",
       link: "/categories/3/products",
     },
   ];

@@ -12,8 +12,6 @@ export default function ProductOption() {
   // Lấy dữ liệu tìm kiếm từ trang trước (nếu có)
   const location = useLocation();
   const searchResult = location.state?.result || null;
-  console.log(searchResult);
-
   // Lấy danh sách danh mục khi load trang
   useEffect(() => {
     const fetchData = async () => {

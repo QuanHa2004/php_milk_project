@@ -22,6 +22,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Khởi tạo controller
 $auth       = new Controllers\AuthController();
 $socialAuth = new Controllers\SocialAuthController();
+$user       = new Controllers\Customer\UserController();
 $category   = new Controllers\Customer\CategoryController();
 $product    = new Controllers\Customer\ProductController();
 $cart       = new Controllers\Customer\CartController();

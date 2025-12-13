@@ -28,7 +28,6 @@ export default function CategoryManagement() {
                   </p>
                 </div>
 
-                {/* Điều hướng sang trang thêm danh mục */}
                 <button
                   onClick={() => navigate('/admin/add-category')}
                   className="flex items-center justify-center gap-2 rounded-xl h-10 px-5 bg-amber-900 text-white text-sm font-bold shadow-lg shadow-amber-900/20 hover:bg-amber-800 hover:-translate-y-0.5 transition-all duration-300"

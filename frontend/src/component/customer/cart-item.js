@@ -12,22 +12,27 @@ export default function CartItem() {
     fetchCartItems,
   } = useCart();
 
+  console.log("Cart items:", cartItems);
+
   const token = localStorage.getItem("access_token");
   const [checkAll, setCheckAll] = useState(false);
 
-  // Cập nhật trạng thái "chọn tất cả" khi giỏ hàng thay đổi
+  // -- State Effects ----------------------------------------------------
+  // Update `checkAll` when cart items change
   useEffect(() => {
     setCheckAll(cartItems.length > 0 && cartItems.every(item => item.is_checked));
   }, [cartItems]);
 
-  // Cập nhật trạng thái chọn / bỏ chọn của từng sản phẩm
-  const updateItemStatus = async (product_id, is_checked) => {
+  // -- Cart update handlers ---------------------------------------------
+  // Update a single cart item's checked status (guest or API)
+  const updateItemStatus = async (variant_id, is_checked) => {
     try {
+      // Guest mode
       if (!token) {
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         cart = cart.map(item =>
-          item.product_id === product_id
+          item.variant_id === variant_id
             ? { ...item, is_checked }
             : item
         );
@@ -37,8 +42,7 @@ export default function CartItem() {
         return;
       }
 
-      // Nếu đã đăng nhập → cập nhật backend
-      const res = await fetch(`http://localhost:8000/carts/${product_id}/status`, {
+      const res = await fetch(`http://localhost:8000/carts/${variant_id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -58,30 +62,29 @@ export default function CartItem() {
     }
   };
 
-  // Xử lý chọn / bỏ chọn tất cả sản phẩm
+  // Toggle select/deselect all cart items
   const handleCheckboxAll = () => {
     const newIsChecked = !cartItems.every(item => item.is_checked);
 
-    setCartItems(prev =>
-      prev.map(item => ({ ...item, is_checked: newIsChecked }))
-    );
+    const updated = cartItems.map(item => ({ ...item, is_checked: newIsChecked }));
+    setCartItems(updated);
 
-    cartItems.forEach(item => updateItemStatus(item.product_id, newIsChecked));
+    updated.forEach(item => updateItemStatus(item.variant_id, newIsChecked));
   };
 
-  // Xử lý chọn / bỏ chọn từng sản phẩm
-  const handleCheckboxChange = async (product_id, is_checked) => {
+  // Toggle select/deselect a single cart item
+  const handleCheckboxChange = (variant_id, is_checked) => {
     const newIsChecked = !is_checked;
 
     setCartItems(prev =>
       prev.map(item =>
-        item.product_id === product_id
+        item.variant_id === variant_id
           ? { ...item, is_checked: newIsChecked }
           : item
       )
     );
 
-    updateItemStatus(product_id, newIsChecked);
+    updateItemStatus(variant_id, newIsChecked);
   };
 
   return (
@@ -110,7 +113,7 @@ export default function CartItem() {
             <input
               type="checkbox"
               checked={product.is_checked || false}
-              onChange={() => handleCheckboxChange(product.product_id, product.is_checked)}
+              onChange={() => handleCheckboxChange(product.variant_id, product.is_checked)}
               className="w-5 h-5 accent-[#8b4513] cursor-pointer"
             />
           </div>
@@ -120,14 +123,24 @@ export default function CartItem() {
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-20"
               style={{ backgroundImage: `url("${product.image_url}")` }}
             />
-            <div className="flex flex-col justify-center">
-              <p className="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">
+            <div>
+              {/* TÊN SẢN PHẨM */}
+              <p className="text-gray-900 dark:text-white font-medium">
                 {product.product_name}
               </p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal line-clamp-2">
-                {product.description}
-              </p>
+
+              {/* QUY CÁCH + DUNG TÍCH */}
+              {(product.packaging_type || product.volume) && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  {product.packaging_type}
+                  {product.packaging_type && product.volume && (
+                    <span className="mx-1">·</span>
+                  )}
+                  {product.volume}
+                </p>
+              )}
             </div>
+
           </div>
 
           <div className="text-center text-gray-900 dark:text-white">
@@ -135,17 +148,17 @@ export default function CartItem() {
           </div>
 
           <div className="flex justify-center items-center gap-2 text-gray-900 dark:text-white">
-            <button onClick={() => decrease(product.product_id)}>-</button>
+            <button onClick={() => decrease(product.variant_id, product.batch_id)}>-</button>
             <input
               type="number"
               min="1"
               value={product.quantity}
               onChange={(e) =>
-                updateQuantity(product.product_id, parseInt(e.target.value) || 1)
+                updateQuantity(product.variant_id, parseInt(e.target.value) || 1)
               }
               className="w-10 text-center bg-transparent"
             />
-            <button onClick={() => increase(product.product_id)}>+</button>
+            <button onClick={() => increase(product.variant_id, product.batch_id)}>+</button>
           </div>
 
           <div className="text-right text-gray-900 dark:text-white font-semibold">
@@ -154,7 +167,7 @@ export default function CartItem() {
 
           <div className="col-span-full md:col-span-1 flex justify-end md:justify-center">
             <button
-              onClick={() => removeFromCart(product.product_id)}
+              onClick={() => removeFromCart(product.variant_id, product.batch_id)}
               className="text-gray-500 hover:text-red-500"
             >
               <span className="material-symbols-outlined">delete</span>

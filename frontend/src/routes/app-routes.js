@@ -15,6 +15,7 @@ import AddProduct from '../pages/admin/add-product';
 
 // customer pages
 import Home from '../pages/customer/home';
+import Profile from '../pages/customer/profile';
 import Product from '../pages/customer/product';
 import ProductDetail from '../pages/customer/product-detail';
 import Cart from '../pages/customer/cart';
@@ -26,11 +27,11 @@ export default function AppRoutes() {
   return (
     <Routes>
 
-      {/* ==== Auth ==== */}
+      // Auth routes
       <Route path="/login" element={<Login />} />
       <Route path="/registration" element={<Registration />} />
 
-      {/* ==== Admin (có bảo vệ) ==== */}
+      // Admin routes (protected)
       <Route element={<ProtectedRoutes />}>
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/order" element={<Order />} />
@@ -40,8 +41,9 @@ export default function AppRoutes() {
         <Route path="/admin/add-product" element={<AddProduct />} />
       </Route>
 
-      {/* ==== Customer ==== */}
+      // Customer routes
       <Route path="/" element={<Home />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/products" element={<Product />} />
       <Route path="/categories/:category_id/products" element={<Product />} />
       <Route path="/product-details/:product_id" element={<ProductDetail />} />

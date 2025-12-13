@@ -5,7 +5,7 @@ namespace Helpers;
 class Response
 {
 
-    // Trả về JSON kèm mã trạng thái HTTP
+    // Return JSON response with HTTP status code and exit
     public static function json($data, $status = 200)
     {
         http_response_code($status);

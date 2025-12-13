@@ -64,35 +64,46 @@ class Order
     {
         $db = Connection::get();
 
-        $total_item_amount = $item['price'] * $item['quantity'];
+        // Tổng tiền cho từng dòng sản phẩm
+        $total_amount = $item['price'] * $item['quantity'];
 
         $sql = "INSERT INTO order_detail (
-                    order_id, product_id,
-                    product_name, price, quantity,
-                    total_item_amount
-                ) VALUES (
-                    :order_id, :product_id,
-                    :product_name, :price, :quantity,
-                    :total_item_amount
-                )";
+                order_id,
+                variant_id,
+                batch_id,
+                price,
+                quantity,
+                total_amount
+            ) VALUES (
+                :order_id,
+                :variant_id,
+                :batch_id,
+                :price,
+                :quantity,
+                :total_amount
+            )";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            'order_id'          => $item['order_id'],
-            'product_id'        => $item['product_id'],
-            'product_name'      => $item['product_name'],
-            'price'             => $item['price'],
-            'quantity'          => $item['quantity'],
-            'total_item_amount' => $total_item_amount
+            'order_id'     => $item['order_id'],
+            'variant_id'   => $item['variant_id'],
+            'batch_id'     => $item['batch_id'] ?? null, // batch_id từ cart hoặc null
+            'price'        => $item['price'],
+            'quantity'     => $item['quantity'],
+            'total_amount' => $total_amount
         ]);
+
+        return $db->lastInsertId();
     }
+
+
 
 
     /* ============================
        3. GHI LOG THANH TOÁN
     ============================ */
     // Lưu lịch sử thanh toán vào bảng payments
-    public static function addPaymentLog($order_id, $method, $amount, $status = 'PENDING', $extraData = [])
+    public static function addPaymentLog($order_id, $method, $amount, $status = 'SUCCESS', $extraData = [])
     {
         $db = Connection::get();
 
@@ -169,6 +180,19 @@ class Order
         $db = Connection::get();
         $stmt = $db->prepare("SELECT * FROM order_detail WHERE order_id = :id");
         $stmt->execute(['id' => $order_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* 7. Lấy danh sách đơn hàng theo user_id */
+    public static function getOrdersByUserId($user_id)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("
+            SELECT * FROM orders 
+            WHERE user_id = :id 
+            ORDER BY order_date DESC
+        ");
+        $stmt->execute(['id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -19,28 +19,14 @@ export default function Home() {
               <div className="@container">
                 <div className="@[480px]">
                   <div
-                    className="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center"
+                    className="flex min-h-[580px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center"
                     style={{
                       backgroundImage:
                         `linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%), 
-                        url("https://cdn.pixabay.com/photo/2017/10/28/06/48/cow-2896329_1280.jpg")`,
+                        url("/images/fresh-milk-is-the-best.png")`,
                     }}
                   >
-                    <div className="flex flex-col gap-2 text-center">
-                      <h1 className="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-6xl">
-                        Fresh Milk
-                      </h1>
-                      <h2 className="text-white text-lg @[480px]:text-xl">
-                        Ghé thăm cửa hàng của chúng tôi
-                      </h2>
-                    </div>
-
-                    <button
-                      onClick={() => navigate('/products')}
-                      className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 @[480px]:h-14 @[480px]:px-6 bg-secondary text-white text-base font-bold hover:bg-opacity-90 transition-opacity"
-                    >
-                      <span className="truncate">Mua ngay</span>
-                    </button>
+                    
                   </div>
                 </div>
               </div>
