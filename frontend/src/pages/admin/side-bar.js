@@ -1,39 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import useCart from "../../context/cart-context";
 
 export default function SideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentUser, setCurrentUser] = useState({});
-  const { logOut, updateToken } = useCart();
-
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-
-    if (token) {
-      fetch("http://localhost:8000/current_user", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-          return res.json();
-        })
-        .then((data) => setCurrentUser(data))
-        .catch((err) => console.error("Lỗi:", err));
-    }
-  }, []);
-
-  // Xử lý đăng xuất
-  const handleLogOut = () => {
-    updateToken(null);
-    logOut();
-    setCurrentUser("Đăng nhập");
-    navigate("/login", { replace: true });
-  };
 
   const icons = {
     dashboard: (
@@ -86,6 +55,14 @@ export default function SideBar() {
         <circle cx="18.5" cy="18.5" r="2.5"></circle>
       </svg>
     ),
+    // --- ICON MỚI: KHIẾU NẠI (Alert/Message) ---
+    complaint: (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    ),
     promotion: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
@@ -112,20 +89,6 @@ export default function SideBar() {
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
         <polyline points="9 22 9 12 15 12 15 22"></polyline>
       </svg>
-    ),
-    review: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-      </svg>
     )
   };
 
@@ -137,12 +100,13 @@ export default function SideBar() {
     { icon: icons.user, text: "Người dùng", url: "/admin/user" },
     { icon: icons.manufacturer, text: "Nhà sản xuất", url: "/admin/manufacturer" },
     { icon: icons.supplier, text: "Nhà cung cấp", url: "/admin/supplier" },
+    // --- MỤC MỚI: KHIẾU NẠI ---
+    { icon: icons.complaint, text: "Khiếu nại", url: "/admin/feedback" },
+    // -------------------------
     { icon: icons.promotion, text: "Mã giảm giá", url: "/admin/promotion" },
     { icon: icons.invoice, text: "Nhập hàng", url: "/admin/invoice" },
-    { icon: icons.review, text: "Đánh giá", url: "/admin/review" },
   ];
 
-  // Kiểm tra mục nào đang active dựa trên URL
   const isActive = (url) => {
     if (url === "/admin/dashboard" && location.pathname === "/admin/dashboard") return true;
     return location.pathname.startsWith(url) && url !== "/admin/dashboard";
@@ -201,15 +165,15 @@ export default function SideBar() {
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-stone-800 dark:text-stone-100 truncate">
-              {currentUser.full_name}
+              Admin
             </p>
             <p className="text-xs text-stone-600 dark:text-stone-400 truncate">
-              {currentUser.email}
+              admin@freshmilk.com
             </p>
           </div>
 
           <button
-            onClick={handleLogOut}
+            onClick={() => alert("Đăng xuất")}
             className="text-stone-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors p-1.5 rounded-lg"
             title="Đăng xuất"
           >

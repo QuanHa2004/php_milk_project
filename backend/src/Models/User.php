@@ -118,4 +118,11 @@ class User
         $stmt->execute($params);
         return $stmt->rowCount();
     }
+
+    public static function all()
+    {
+        $db = Connection::get();
+        $stmt = $db->query("SELECT * FROM user");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

@@ -14,9 +14,8 @@ export default function CategoryList() {
                 }
 
                 const data = await res.json();
-
-                if (Array.isArray(data)) {
-                    setCategoryList(data);
+                if (Array.isArray(data.data)) {
+                    setCategoryList(data.data);
                 } else {
                     setCategoryList([]);
                 }
@@ -41,9 +40,6 @@ export default function CategoryList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase tracking-wider w-1/2">
                                 Tên danh mục
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase tracking-wider w-1/4">
-                                Số lượng sản phẩm
-                            </th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase tracking-wider w-1/4 text-right">
                                 Hành động
                             </th>
@@ -53,7 +49,7 @@ export default function CategoryList() {
                     <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
                         {isLoading ? (
                             <tr>
-                                <td colSpan="3" className="px-6 py-8 text-center text-stone-500">
+                                <td colSpan="2" className="px-6 py-8 text-center text-stone-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
@@ -69,12 +65,6 @@ export default function CategoryList() {
                                                 {category.category_name}
                                             </span>
                                         </div>
-                                    </td>
-
-                                    <td className="px-6 py-4">
-                                        <span className={`text-sm font-medium ${category.quantity > 0 ? 'text-stone-600 dark:text-stone-400' : 'text-red-500'}`}>
-                                            {category.quantity}
-                                        </span>
                                     </td>
 
                                     <td className="px-6 py-4 text-right">

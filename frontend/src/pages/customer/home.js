@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 
 import Header from '../../component/customer/header';
 import Footer from '../../component/customer/footer';
@@ -6,7 +5,6 @@ import BestSellingProduct from '../../component/customer/best-seller';
 import Explore from '../../component/customer/explore';
 
 export default function Home() {
-  const navigate = useNavigate();
 
   return (
     <div className="bg-white dark:bg-background-dark font-display text-text-color">

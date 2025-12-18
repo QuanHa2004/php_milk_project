@@ -4,7 +4,7 @@ namespace Models;
 
 use Database\Connection;
 use PDO;
-use PDOException;
+use Exception;
 
 class Product
 {
@@ -12,7 +12,7 @@ class Product
        1. LẤY TẤT CẢ SẢN PHẨM
     ============================ */
     // Trả về danh sách sản phẩm (kèm tên danh mục)
-    public static function all()
+    public static function all_1()
     {
         $db = Connection::get();
 
@@ -36,6 +36,98 @@ class Product
 
         return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public static function all()
+    {
+        $db = Connection::get();
+
+        $sql = "
+                SELECT 
+                p.product_id,
+                p.product_name,
+                p.category_id,
+                c.category_name,
+                p.image_url,
+                p.description,
+                p.is_hot,
+
+                -- Tổng tồn kho (từ batch)
+                (
+                    SELECT SUM(pb.quantity)
+                    FROM product_variant pv
+                    JOIN product_batch pb ON pb.variant_id = pv.variant_id
+                    WHERE pv.product_id = p.product_id
+                    AND pv.is_active = 1
+                ) AS total_stock,
+
+                -- Khoảng giá
+                (
+                    SELECT MIN(price)
+                    FROM product_variant
+                    WHERE product_id = p.product_id AND is_active = 1
+                ) AS min_price,
+
+                (
+                    SELECT MAX(price)
+                    FROM product_variant
+                    WHERE product_id = p.product_id AND is_active = 1
+                ) AS max_price,
+
+                -- DANH SÁCH VARIANT + BATCH
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'variant_id', pv.variant_id,
+                            'variant_name', COALESCE(pv.variant_name, CONCAT(pv.packaging_type, ' ', pv.volume)),
+                            'packaging_type', pv.packaging_type,
+                            'volume', pv.volume,
+                            'price', pv.price,
+
+                            -- Tồn kho theo variant
+                            'stock_quantity', (
+                                SELECT SUM(pb.quantity)
+                                FROM product_batch pb
+                                WHERE pb.variant_id = pv.variant_id
+                            ),
+
+                            -- DANH SÁCH BATCH
+                            'batches', (
+                                SELECT JSON_ARRAYAGG(
+                                    JSON_OBJECT(
+                                        'batch_id', pb.batch_id,
+                                        'quantity', pb.quantity,
+                                        'manufacturing_date', pb.manufacturing_date,
+                                        'expiration_date', pb.expiration_date
+                                    )
+                                )
+                                FROM product_batch pb
+                                WHERE pb.variant_id = pv.variant_id
+                            )
+                        )
+                    )
+                    FROM product_variant pv
+                    WHERE pv.product_id = p.product_id
+                    AND pv.is_active = 1
+                ) AS variants
+
+                FROM product p
+                LEFT JOIN category c ON p.category_id = c.category_id
+                WHERE p.is_deleted = 0
+                ORDER BY p.product_id DESC
+                ";
+
+        $result = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        // Decode JSON
+        foreach ($result as &$row) {
+            $row['variants'] = $row['variants']
+                ? json_decode($row['variants'], true)
+                : [];
+        }
+
+        return $result;
+    }
+
 
 
     /* ============================
@@ -304,72 +396,54 @@ class Product
     public static function create($data)
     {
         $db = Connection::get();
+        $db->beginTransaction();
 
         try {
-            $db->beginTransaction();
+            // 1️⃣ Insert bảng product
+            $stmt = $db->prepare("
+                INSERT INTO product 
+                (product_name, category_id, manufacturer_id, image_url, description, is_hot)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
 
-            /* --- A. INSERT PRODUCT --- */
-            $sqlProduct = "
-                INSERT INTO product (
-                    product_name, category_id, price, quantity,
-                    discount_percent, image_url, description, is_hot, created_at
-                ) VALUES (
-                    :name, :cat_id, :price, :qty,
-                    :discount, :img, :desc, :is_hot, NOW()
-                )
-            ";
-
-            $stmt = $db->prepare($sqlProduct);
             $stmt->execute([
-                'name'      => $data['product_name'],
-                'cat_id'    => $data['category_id'],
-                'price'     => $data['price'],
-                'qty'       => $data['quantity'],
-                'discount'  => $data['discount_percent'] ?? 0,
-                'img'       => $data['image_url'] ?? null,
-                'desc'      => $data['description'] ?? null,
-                'is_hot'    => !empty($data['is_hot']) ? 1 : 0
+                $data['product_name'],
+                $data['category_id'],
+                $data['manufacturer_id'] ?? null,
+                $data['image_url'] ?? null,
+                $data['description'] ?? null,
+                $data['is_hot'] ?? 0
             ]);
 
             $productId = $db->lastInsertId();
 
+            $detail = $data['detail'] ?? [];
 
-            /* --- B. INSERT PRODUCT_DETAIL --- */
-            $vitamins = !empty($data['vitamins']) ? json_encode($data['vitamins'], JSON_UNESCAPED_UNICODE) : null;
-            $minerals = !empty($data['minerals']) ? json_encode($data['minerals'], JSON_UNESCAPED_UNICODE) : null;
+            $stmtDetail = $db->prepare("
+                INSERT INTO product_detail
+                (product_id, origin, ingredients, `usage`, storage, calories, protein, fat, carbohydrates, sugar, vitamins, minerals, other_nutrients)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
 
-            $sqlDetail = "
-                INSERT INTO product_detail (
-                    product_id, origin, ingredients, `usage`, storage,
-                    calories, protein, fat, carbohydrates, sugar,
-                    vitamins, minerals, other_nutrients
-                ) VALUES (
-                    :id, :origin, :ingredients, :usage, :storage,
-                    :cal, :prot, :fat, :carb, :sugar,
-                    :vit, :min, :other
-                )
-            ";
-
-            $stmtDetail = $db->prepare($sqlDetail);
             $stmtDetail->execute([
-                'id'          => $productId,
-                'origin'      => $data['origin'] ?? null,
-                'ingredients' => $data['ingredients'] ?? null,
-                'usage'       => $data['usage'] ?? null,
-                'storage'     => $data['storage'] ?? null,
-                'cal'         => $data['calories'] ?? 0,
-                'prot'        => $data['protein'] ?? 0,
-                'fat'         => $data['fat'] ?? 0,
-                'carb'        => $data['carbohydrates'] ?? 0,
-                'sugar'       => $data['sugar'] ?? 0,
-                'vit'         => $vitamins,
-                'min'         => $minerals,
-                'other'       => $data['other_nutrients'] ?? null
+                $productId,
+                $detail['origin'] ?? null,
+                $detail['ingredients'] ?? null,
+                $detail['usage'] ?? null,
+                $detail['storage'] ?? null,
+                $detail['calories'] ?? 0,
+                $detail['protein'] ?? 0,
+                $detail['fat'] ?? 0,
+                $detail['carbohydrates'] ?? 0,
+                $detail['sugar'] ?? 0,
+                isset($detail['vitamins']) ? json_encode($detail['vitamins']) : null,
+                isset($detail['minerals']) ? json_encode($detail['minerals']) : null,
+                $detail['other_nutrients'] ?? null
             ]);
 
             $db->commit();
             return $productId;
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $db->rollBack();
             throw $e;
         }
@@ -397,5 +471,33 @@ class Product
         ]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function updateStockQuantity($variant_id, $quantity)
+    {
+        $db = Connection::get();
+        try {
+            $stmt = $db->prepare("UPDATE product_variant SET stock_quantity = stock_quantity + ? WHERE variant_id = ?");
+            $stmt->execute([$quantity, $variant_id]);
+        } catch (Exception $e) {
+            throw new Exception("Cập nhật số lượng kho thất bại: " . $e->getMessage());
+        }
+    }
+
+    public static function addProductBatch($data)
+    {
+        $db = Connection::get();
+        try {
+            $stmt = $db->prepare("INSERT INTO product_batch (variant_id, quantity, manufacturing_date, expiration_date) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $data['variant_id'],
+                $data['quantity'],
+                $data['manufacturing_date'] ?? null,
+                $data['expiration_date']
+            ]);
+            return $db->lastInsertId();
+        } catch (Exception $e) {
+            throw new Exception("Thêm lô hàng thất bại: " . $e->getMessage());
+        }
     }
 }

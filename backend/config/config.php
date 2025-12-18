@@ -1,5 +1,28 @@
 <?php
 
+// 1. Hàm đọc file .env và nạp vào môi trường
+$envPath = __DIR__ . '/../.env';
+
+if (file_exists($envPath)) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        // Bỏ qua dòng comment
+        if (strpos(trim($line), '#') === 0) continue;
+
+        // Tách Key và Value
+        if (strpos($line, '=') !== false) {
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+
+            // Nạp vào biến môi trường
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+    }
+}
+
 // Token
 define('SECRET_KEY', getenv('SECRET_KEY') ?: 'mysecretkey');
 define('REFRESH_SECRET_KEY', getenv('REFRESH_SECRET_KEY') ?: 'myrefreshsecretkey');

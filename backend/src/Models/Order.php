@@ -195,4 +195,11 @@ class Order
         $stmt->execute(['id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public static function all()
+    {
+        $db = Connection::get();
+        $stmt = $db->query("SELECT * FROM `orders` ORDER BY order_id DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

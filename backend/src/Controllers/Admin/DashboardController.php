@@ -95,27 +95,7 @@ class DashboardController
     }
 
     // Lấy danh sách danh mục kèm tổng số lượng sản phẩm
-    public function getCategories()
-    {
-        $db = Connection::get();
-
-        $sql = "
-            SELECT 
-                c.category_id, 
-                c.category_name,
-                COALESCE(SUM(p.quantity), 0) AS quantity
-            FROM category c
-            LEFT JOIN product p 
-                ON c.category_id = p.category_id AND p.is_deleted = 0
-            GROUP BY c.category_id, c.category_name 
-            ORDER BY c.category_id;
-        ";
-
-        $stmt = $db->query($sql);
-        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        Response::json($categories);
-    }
+    
 
     // Lấy danh sách sản phẩm
     public function getProducts()

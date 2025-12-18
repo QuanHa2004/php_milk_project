@@ -1,5 +1,9 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
@@ -28,7 +32,17 @@ $product    = new Controllers\Customer\ProductController();
 $cart       = new Controllers\Customer\CartController();
 $order      = new Controllers\Customer\OrderController();
 $payment    = new Controllers\Customer\PaymentController();
-$dashboard  = new Controllers\Admin\DashboardController();
+
+
+$orderAdmin        = new Controllers\Admin\OrderController();
+$categoryAdmin     = new Controllers\Admin\CategoryController();
+$manufacturerAdmin = new Controllers\Admin\ManufacturerController();
+$supplierAdmin     = new Controllers\Admin\SupplierController();
+$productAdmin      = new Controllers\Admin\ProductController();
+$invoiceAdmin      = new Controllers\Admin\InvoiceController();
+$promotionAdmin    = new Controllers\Admin\PromotionController();
+$userAdmin         = new Controllers\Admin\UserController();
+$reviewAdmin       = new Controllers\Admin\ReviewController();
 
 // Load route
 require_once __DIR__ . '/../src/Routes/api.php';

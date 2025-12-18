@@ -14,13 +14,14 @@ export default function AddCategory() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:8000/admin/categories", {
+      const res = await fetch("http://localhost:8000/admin/categories/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category_name: categoryName }),
       });
 
       if (res.ok) {
+        alert("Them thanh cong!");
         navigate("/admin/category");
       } else {
         alert("Có lỗi xảy ra!");

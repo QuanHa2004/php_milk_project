@@ -14,7 +14,7 @@ class ProductController
     // Trả về toàn bộ danh sách sản phẩm
     public function index()
     {
-        return Response::json(Product::all());
+        return Response::json(Product::all_1());
     }
 
     /* ============================
