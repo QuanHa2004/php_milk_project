@@ -125,3 +125,15 @@ if ($uri === "/auth/google/callback" && $method === "GET") {
     $socialAuth->handleGoogleCallback();
     exit;
 }
+
+if ($uri === "/reviews/add" && $method === "POST") {
+    $review->addReview(json_decode(file_get_contents('php://input'), true));
+    exit;
+}
+
+if (preg_match('#^/reviews/(\d+)/(\d+)$#', $uri, $matches) && $method === "GET") {
+    $product_id = (int)$matches[1];
+    $variant_id = (int)$matches[2];
+    $review->getProductReviews($product_id, $variant_id);
+    exit;
+}

@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import useCart from "../../context/cart-context";
 
 export default function ProductOption() {
   const { category_id } = useParams();
   const [categoriesList, setCategoryList] = useState([]);
   const [products, setProducts] = useState([]);
-  const { addToCart } = useCart();
   const navigate = useNavigate();
 
   // Lấy dữ liệu tìm kiếm từ trang trước (nếu có)
@@ -59,15 +57,6 @@ export default function ProductOption() {
     navigate(`/product-details/${product.product_id}`);
   };
 
-  // Thêm sản phẩm vào giỏ hàng
-  const handleAdd = async (e, product) => {
-    e.stopPropagation();
-    try {
-      await addToCart(product, 1);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   // Chọn danh mục để lọc sản phẩm
   const clickCategory = (category_id) => {
@@ -130,16 +119,6 @@ export default function ProductOption() {
                           Số lượng còn: {product.quantity}
                         </p>
                       </div>
-
-                      <button
-                        onClick={(e) => handleAdd(e, product)}
-                        className="mt-4 w-full flex items-center justify-center rounded-lg h-10 bg-primary text-white text-sm font-bold tracking-wide transition-colors duration-300 hover:bg-primary/90 group-hover:bg-primary"
-                      >
-                        <span className="material-symbols-outlined mr-2">
-                          add_shopping_cart
-                        </span>
-                        Thêm vào giỏ hàng
-                      </button>
                     </div>
                   </div>
                 </li>

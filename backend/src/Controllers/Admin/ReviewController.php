@@ -8,8 +8,6 @@ use Exception;
 
 class ReviewController
 {
-
-
     public function getReviewList()
     {
         try {

@@ -21,7 +21,7 @@ export default function ReviewManagement() {
                     Quản lý đánh giá
                   </p>
                   <p className="text-stone-500 dark:text-stone-400 text-sm">
-                    Kiểm soát 
+                    Kiểm soát đánh giá của khách hàng
                   </p>
                 </div>
               </div>

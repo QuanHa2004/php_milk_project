@@ -32,6 +32,7 @@ $product    = new Controllers\Customer\ProductController();
 $cart       = new Controllers\Customer\CartController();
 $order      = new Controllers\Customer\OrderController();
 $payment    = new Controllers\Customer\PaymentController();
+$review    = new Controllers\Customer\ReviewController();
 
 
 $orderAdmin        = new Controllers\Admin\OrderController();
