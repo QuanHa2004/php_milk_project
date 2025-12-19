@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import Header from "../../component/customer/header";
 import Footer from "../../component/customer/footer";
 import useCart from "../../context/cart-context";
+import ReviewSection from "../../component/customer/review-section";
+import NutrientSection from "../../component/customer/nutrient-section";
 
 export default function ProductDetail() {
     const { product_id } = useParams();
@@ -12,81 +14,16 @@ export default function ProductDetail() {
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
-    // State lưu lựa chọn của người dùng
+
     const [selectedVolume, setSelectedVolume] = useState(null);
     const [selectedPack, setSelectedPack] = useState(null);
 
-    const [reviews, setReviews] = useState([]);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-
-
-
-    const handleSubmitReview = async () => {
-        if (!rating) {
-            alert("Vui lòng chọn số sao đánh giá");
-            return;
-        }
-
-        if (!currentVariant) {
-            alert("Vui lòng chọn biến thể sản phẩm");
-            return;
-        }
-
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            alert("Vui lòng đăng nhập để đánh giá");
-            return;
-        }
-
-        try {
-            setIsSubmittingReview(true);
-
-            const res = await fetch("http://localhost:8000/reviews/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    variant_id: currentVariant.variant_id,
-                    rating: rating,
-                    comment: comment,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok || !data.success) {
-                throw new Error(data.message || "Gửi đánh giá thất bại");
-            }
-
-            alert("Cảm ơn bạn đã đánh giá sản phẩm");
-
-            // Reset form
-            setRating(0);
-            setComment("");
-
-        } catch (err) {
-            console.error(err);
-            alert(err.message);
-        } finally {
-            setIsSubmittingReview(false);
-        }
-    };
-
-
-    /* ===========================
-       1. FETCH DATA
-    ============================ */
     useEffect(() => {
         fetch(`http://localhost:8000/products/${product_id}`)
             .then((res) => res.json())
             .then((data) => {
                 setProduct(data);
 
-                // Mặc định chọn biến thể đầu tiên khi load trang
                 if (data.variants && data.variants.length > 0) {
                     const firstVariant = data.variants[0];
                     setSelectedVolume(firstVariant.volume);
@@ -96,19 +33,11 @@ export default function ProductDetail() {
             .catch(err => console.error("Lỗi tải sản phẩm:", err));
     }, [product_id]);
 
-    /* ===========================
-       2. LOGIC TÍNH TOÁN DYNAMIC
-    ============================ */
-
-    // A. Lấy danh sách các Dung tích (Volume) duy nhất từ variants
-    // Kết quả VD: ["180ml", "110ml"]
     const uniqueVolumes = useMemo(() => {
         if (!product?.variants) return [];
         return [...new Set(product.variants.map(v => v.volume))];
     }, [product]);
 
-    // B. Lấy danh sách Quy cách (Packaging) KHẢ DỤNG dựa trên Dung tích đang chọn
-    // Nếu chọn "180ml", chỉ hiện các loại gói của 180ml (Thùng, Lốc)
     const availablePacks = useMemo(() => {
         if (!product?.variants || !selectedVolume) return [];
         return product.variants
@@ -116,7 +45,6 @@ export default function ProductDetail() {
             .map(v => v.packaging_type);
     }, [product, selectedVolume]);
 
-    // C. Tìm ra Biến thể cụ thể (Variant Object) khớp với cả 2 lựa chọn
     const currentVariant = useMemo(() => {
         if (!product?.variants) return null;
         return product.variants.find(
@@ -124,17 +52,10 @@ export default function ProductDetail() {
         );
     }, [product, selectedVolume, selectedPack]);
 
-    /* ===========================
-       3. HANDLERS
-    ============================ */
 
-    // Xử lý khi đổi Dung tích
     const handleVolumeChange = (newVolume) => {
         setSelectedVolume(newVolume);
 
-        // Logic thông minh: Khi đổi dung tích, phải kiểm tra xem quy cách cũ có hợp lệ ko?
-        // Nếu không hợp lệ (VD: Đang chọn Lon, đổi sang size hộp giấy), 
-        // thì tự động chọn quy cách đầu tiên của dung tích mới.
         const variantsOfNewVolume = product.variants.filter(v => v.volume === newVolume);
         const hasCurrentPack = variantsOfNewVolume.some(v => v.packaging_type === selectedPack);
 
@@ -142,17 +63,6 @@ export default function ProductDetail() {
             setSelectedPack(variantsOfNewVolume[0].packaging_type);
         }
     };
-
-    useEffect(() => {
-        if (!product_id || !currentVariant?.variant_id) return;
-
-        fetch(`http://localhost:8000/reviews/${product_id}/${currentVariant.variant_id}`)
-            .then(res => res.json())
-            .then(data => {
-                setReviews(data.data || []);
-            })
-            .catch(err => console.error("Lỗi tải đánh giá:", err));
-    }, [product_id, currentVariant]);
 
 
     const handleAdd = async (e) => {
@@ -175,16 +85,11 @@ export default function ProductDetail() {
                 {
                     product_id: product.product_id,
                     product_name: product.product_name,
-
-                    // Variant
                     variant_id: currentVariant.variant_id,
                     volume: currentVariant.volume,
                     packaging_type: currentVariant.packaging_type,
                     price: currentVariant.price,
-
-                    // ✅ Batch FIFO backend đã chọn sẵn
                     batch_id: currentVariant.batch_id,
-
                     image_url: currentVariant.image_url || product.image_url,
                 },
                 quantity
@@ -194,10 +99,6 @@ export default function ProductDetail() {
             alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
         }
     };
-
-
-
-
 
     const increase = () => setQuantity((prev) => prev + 1);
     const decrease = () => setQuantity((prev) => Math.max(1, prev - 1));
@@ -312,178 +213,11 @@ export default function ProductDetail() {
                                 </div>
                             </div>
 
-                            <div className="mt-12">
-                                <h3 className="text-[#333333] dark:text-white text-xl font-bold border-b-2 border-gray-200 dark:border-gray-700 pb-2 mb-6">
-                                    Thông tin chi tiết
-                                </h3>
+                            <NutrientSection product={product} />
 
-                                <div className="text-[#333333] dark:text-gray-300 space-y-8">
-                                    <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                                            <div className="space-y-6">
-                                                <div className="space-y-1">
-                                                    <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Xuất xứ</span>
-                                                    <p className="font-medium text-lg text-[#333333] dark:text-white">{product.origin || "Việt Nam"}</p>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Thành phần</span>
-                                                    <p className="font-medium text-[#333333] dark:text-white text-justify">{product.ingredients || "100% Sữa tươi nguyên chất"}</p>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-6">
-                                                <div className="space-y-1">
-                                                    <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hướng dẫn sử dụng</span>
-                                                    <p className="text-[#333333] dark:text-white">{product.usage || "Dùng trực tiếp, ngon hơn khi uống lạnh."}</p>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bảo quản</span>
-                                                    <p className="text-[#333333] dark:text-white">{product.storage || "Để nơi khô ráo, thoáng mát."}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="text-[#333333] dark:text-white text-lg font-bold mb-4">Giá trị dinh dưỡng (trên 100g/ml)</h4>
-                                        <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-                                            <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                                                <div>
-                                                    <table className="w-full text-left border-collapse">
-                                                        <thead className="bg-gray-100 dark:bg-gray-900/50">
-                                                            <tr>
-                                                                <th className="p-3 font-semibold text-sm text-gray-600 dark:text-gray-300">Chỉ số chính</th>
-                                                                <th className="p-3 font-semibold text-sm text-gray-600 dark:text-gray-300 text-right">Hàm lượng</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                            <tr><td className="p-3 text-sm text-gray-600">Năng lượng</td><td className="p-3 text-sm font-bold text-right">{product.calories || 0} kcal</td></tr>
-                                                            <tr><td className="p-3 text-sm text-gray-600">Protein</td><td className="p-3 text-sm font-bold text-right">{product.protein || 0} g</td></tr>
-                                                            <tr><td className="p-3 text-sm text-gray-600">Chất béo</td><td className="p-3 text-sm font-bold text-right">{product.fat || 0} g</td></tr>
-                                                            <tr><td className="p-3 text-sm text-gray-600">Carbohydrate</td><td className="p-3 text-sm font-bold text-right">{product.carbohydrates || 0} g</td></tr>
-                                                            <tr><td className="p-3 text-sm text-gray-600">Đường</td><td className="p-3 text-sm font-bold text-right">{product.sugar || 0} g</td></tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div>
-                                                    <table className="w-full text-left border-collapse">
-                                                        <thead className="bg-gray-100 dark:bg-gray-900/50">
-                                                            <tr>
-                                                                <th className="p-3 font-semibold text-sm text-gray-600">Vitamin & Khoáng chất</th>
-                                                                <th className="p-3 font-semibold text-sm text-gray-600 text-right">Đáp ứng</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                            {(() => {
-                                                                try {
-                                                                    const vits = product.vitamins ? JSON.parse(product.vitamins) : {};
-                                                                    const mins = product.minerals ? JSON.parse(product.minerals) : {};
-                                                                    const micros = { ...vits, ...mins };
-                                                                    if (Object.keys(micros).length === 0) return <tr><td colSpan="2" className="p-3 text-sm text-gray-400 italic text-center">Đang cập nhật</td></tr>;
-                                                                    return Object.entries(micros).map(([k, v], i) => (
-                                                                        <tr key={i}><td className="p-3 text-sm text-gray-600">{k}</td><td className="p-3 text-sm font-bold text-right">{v}</td></tr>
-                                                                    ));
-                                                                } catch { return <tr><td colSpan="2"></td></tr>; }
-                                                            })()}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div className="mt-14">
-                                <h3 className="text-[#333333] dark:text-white text-xl font-bold border-b-2 border-gray-200 dark:border-gray-700 pb-2 mb-6">
-                                    Đánh giá sản phẩm
-                                </h3>
-
-                                <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700 mb-8">
-                                    <div className="flex flex-col gap-4">
-                                        <div className="flex items-center gap-2">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <svg
-                                                    key={star}
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 24 24"
-                                                    fill={star <= rating ? "currentColor" : "none"}
-                                                    stroke="currentColor"
-                                                    onClick={() => setRating(star)}
-                                                    className="w-6 h-6 text-yellow-400 cursor-pointer hover:scale-110 transition-transform"
-                                                >
-                                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                                                </svg>
-                                            ))}
-                                        </div>
-
-
-                                        <textarea
-                                            rows="4"
-                                            value={comment}
-                                            onChange={(e) => setComment(e.target.value)}
-                                            placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
-                                            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        ></textarea>
-
-
-                                        <button
-                                            onClick={handleSubmitReview}
-                                            disabled={isSubmittingReview}
-                                            className="self-end bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary/90 active:scale-95 transition disabled:opacity-60"
-                                        >
-                                            Gửi đánh giá
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6">
-                                    {reviews.length > 0 ? (
-                                        reviews.map((review) => (
-                                            <div
-                                                key={review.review_id}
-                                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm"
-                                            >
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div>
-                                                        <p className="font-semibold text-gray-800 dark:text-white">
-                                                            {review.full_name}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {new Date(review.created_at).toLocaleDateString("vi-VN")}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="flex items-center gap-1">
-                                                        {[1, 2, 3, 4, 5].map((s) => (
-                                                            <svg
-                                                                key={s}
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 24 24"
-                                                                fill={s <= review.rating ? "currentColor" : "none"}
-                                                                stroke="currentColor"
-                                                                className="w-4 h-4 text-yellow-400"
-                                                            >
-                                                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                                                            </svg>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                                                    {review.comment}
-                                                </p>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-sm text-gray-500 italic">
-                                            Chưa có đánh giá nào cho sản phẩm này
-                                        </p>
-                                    )}
-
-                                </div>
-                            </div>
-
+                            <ReviewSection
+                                product_id={product_id}
+                                currentVariant={currentVariant} />
                         </div>
                     </div>
                 </section>

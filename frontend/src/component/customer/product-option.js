@@ -58,7 +58,6 @@ export default function ProductOption() {
       });
   }, [category_id, searchResult]);
 
-  console.log(products);
   // Điều hướng sang trang chi tiết sản phẩm
   const handleClick = (product) => {
     navigate(`/product-details/${product.product_id}`);
