@@ -39,7 +39,6 @@ export default function OrderList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[16%]">Ngày đặt</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[14%]">Tổng tiền</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[18%]">Trạng thái</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%]">Thanh toán</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%] text-right">Hành động</th>
                         </tr>
                     </thead>
@@ -79,25 +78,13 @@ export default function OrderList() {
                                         </td>
 
                                         <td className="px-6 py-4 font-bold text-stone-800 dark:text-stone-100">
-                                            {Number(item.total_amount).toLocaleString("vi-VN")} ₫
+                                            {Number(item.total_amount).toLocaleString("vi-VN")} 
                                         </td>
 
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${status.cls}`}>
                                                 {status.label}
                                             </span>
-                                        </td>
-
-                                        <td className="px-6 py-4">
-                                            {item.is_paid ? (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    Đã thanh toán
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-stone-100 text-stone-600 border border-stone-200">
-                                                    Chưa thanh toán
-                                                </span>
-                                            )}
                                         </td>
 
                                         <td className="px-6 py-4 text-right">
@@ -110,7 +97,7 @@ export default function OrderList() {
                             })
                         ) : (
                             <tr>
-                                <td colSpan="7" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="6" className="px-6 py-12 text-center text-stone-400">
                                     Chưa có đơn hàng nào
                                 </td>
                             </tr>

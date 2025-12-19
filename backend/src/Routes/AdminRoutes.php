@@ -1,12 +1,20 @@
 <?php
 
-// =========================
-// ADMIN GET ROUTES
-// =========================
-// if ($uri === "/admin/reports" && $method === "GET") {
-//     $dashboard->getReport();
-//     exit;
-// }
+if ($uri === "/admin/total-revenue" && $method === "GET") {
+    $orderAdmin->getMonthlyRevenue();
+    exit;
+}
+
+if ($uri === "/admin/new-customer" && $method === "GET") {
+    $userAdmin->getNewUsers();
+    exit;
+}
+
+if ($uri === "/admin/orders" && $method === "GET") {
+    $orderAdmin->getOrderList();
+    exit;
+}
+
 
 if ($uri === "/admin/orders" && $method === "GET") {
     $orderAdmin->getOrderList();
@@ -22,11 +30,6 @@ if ($uri === "/admin/reviews" && $method === "GET") {
     $reviewAdmin->getReviewList();
     exit;
 }
-
-// if ($uri === "/admin/products" && $method === "GET") {
-//     $dashboard->getProducts();
-//     exit;
-// }
 
 if ($uri === "/admin/categories" && $method === "GET") {
     $categoryAdmin->getCategoryList();

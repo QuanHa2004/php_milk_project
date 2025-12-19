@@ -7,10 +7,7 @@ use PDO;
 
 class Order
 {
-    /* ============================
-       1. TẠO ĐƠN HÀNG
-    ============================ */
-    // Tạo đơn hàng mới và trả về order_id
+
     public static function create($data)
     {
         $db = Connection::get();
@@ -55,11 +52,6 @@ class Order
         return $db->lastInsertId();
     }
 
-
-    /* ============================
-       2. THÊM CHI TIẾT ĐƠN HÀNG
-    ============================ */
-    // Thêm từng sản phẩm vào order_detail
     public static function addDetail($item)
     {
         $db = Connection::get();
@@ -87,7 +79,7 @@ class Order
         $stmt->execute([
             'order_id'     => $item['order_id'],
             'variant_id'   => $item['variant_id'],
-            'batch_id'     => $item['batch_id'] ?? null, // batch_id từ cart hoặc null
+            'batch_id'     => $item['batch_id'] ?? null,
             'price'        => $item['price'],
             'quantity'     => $item['quantity'],
             'total_amount' => $total_amount
@@ -96,13 +88,6 @@ class Order
         return $db->lastInsertId();
     }
 
-
-
-
-    /* ============================
-       3. GHI LOG THANH TOÁN
-    ============================ */
-    // Lưu lịch sử thanh toán vào bảng payments
     public static function addPaymentLog($order_id, $method, $amount, $status = 'SUCCESS', $extraData = [])
     {
         $db = Connection::get();
@@ -135,11 +120,6 @@ class Order
         ]);
     }
 
-
-    /* ============================
-       4. CẬP NHẬT TRẠNG THÁI ĐƠN
-    ============================ */
-    // Cập nhật trạng thái + đánh dấu đã thanh toán
     public static function updateStatus($order_id, $status, $is_paid = false)
     {
         $db = Connection::get();
@@ -157,11 +137,6 @@ class Order
         ]);
     }
 
-
-    /* ============================
-       5. LẤY THÔNG TIN ĐƠN HÀNG
-    ============================ */
-    // Lấy thông tin đơn hàng theo ID
     public static function find($order_id)
     {
         $db = Connection::get();
@@ -170,11 +145,6 @@ class Order
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-
-    /* ============================
-       6. LẤY DANH SÁCH SẢN PHẨM TRONG ĐƠN
-    ============================ */
-    // Lấy toàn bộ sản phẩm thuộc đơn hàng
     public static function getDetails($order_id)
     {
         $db = Connection::get();
@@ -183,7 +153,6 @@ class Order
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* 7. Lấy danh sách đơn hàng theo user_id */
     public static function getOrdersByUserId($user_id)
     {
         $db = Connection::get();
@@ -201,5 +170,23 @@ class Order
         $db = Connection::get();
         $stmt = $db->query("SELECT * FROM `orders` ORDER BY order_id DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function totalRevenueAndOrders()
+    {
+        $db = Connection::get();
+
+        $sql = "
+            SELECT 
+                COUNT(*) AS total_orders,
+                SUM(total_amount) AS total_revenue
+            FROM orders
+            WHERE 
+                MONTH(order_date) = MONTH(CURRENT_DATE())
+                AND YEAR(order_date) = YEAR(CURRENT_DATE())
+        ";
+
+        $stmt = $db->query($sql);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

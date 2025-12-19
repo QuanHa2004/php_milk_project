@@ -24,4 +24,20 @@ class UserController
             ], 500);
         }
     }
+
+    public function getNewUsers()
+    {
+        try {
+            $users = User::newUsers();
+            Response::json([
+                'success' => true,
+                'data' => $users
+            ]);
+        } catch (Exception $e) {
+            Response::json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -100,7 +100,9 @@ export default function ProductDetail() {
         }
     };
 
-    const increase = () => setQuantity((prev) => prev + 1);
+    const increase = (maxStock) => {
+        setQuantity((prev) => Math.min(prev + 1, maxStock || 1));
+    };
     const decrease = () => setQuantity((prev) => Math.max(1, prev - 1));
 
     if (!product) return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -128,6 +130,12 @@ export default function ProductDetail() {
                                         {product.product_name}
                                     </h1>
 
+                                    {currentVariant && (
+                                        <p className="text-gray-600 dark:text-gray-400 text-lg mt-1">
+                                            {currentVariant.variant_name}
+                                        </p>
+                                    )}
+
                                     <p className="text-[#333] dark:text-gray-300 py-3">
                                         {product.description}
                                     </p>
@@ -146,17 +154,32 @@ export default function ProductDetail() {
                                     <div className="flex items-center gap-4 mt-6">
                                         <label className="text-[#333] dark:text-gray-300 font-medium">Số lượng:</label>
                                         <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
-                                            <button onClick={decrease} className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg">-</button>
+                                            <button
+                                                onClick={decrease}
+                                                className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg"
+                                            >
+                                                -
+                                            </button>
                                             <input
                                                 type="number"
                                                 min="1"
+                                                max={currentVariant ? currentVariant.stock_quantity : 1}
                                                 value={quantity}
-                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                                onChange={(e) => {
+                                                    const val = parseInt(e.target.value) || 1;
+                                                    setQuantity(Math.min(Math.max(1, val), currentVariant ? currentVariant.stock_quantity : 1));
+                                                }}
                                                 className="w-12 text-center bg-transparent text-[#333] dark:text-white border-none focus:ring-0"
                                             />
-                                            <button onClick={increase} className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg">+</button>
+                                            <button
+                                                onClick={() => increase(currentVariant ? currentVariant.stock_quantity : 1)}
+                                                className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg"
+                                            >
+                                                +
+                                            </button>
                                         </div>
                                     </div>
+
 
                                     <div className="mt-6">
                                         <label className="text-[#333] dark:text-gray-300 font-medium block mb-2">Dung tích / Trọng lượng:</label>

@@ -34,7 +34,6 @@ class ProductController
                 return;
             }
 
-            // Validate bắt buộc
             if (empty($data['product_name']) || empty($data['category_id'])) {
                 Response::json([
                     'message' => 'Tên sản phẩm và danh mục là bắt buộc'

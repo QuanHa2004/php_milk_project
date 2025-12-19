@@ -7,10 +7,7 @@ use PDO;
 
 class User
 {
-    /* ============================
-       1. TÌM USER THEO EMAIL
-    ============================ */
-    // Lấy thông tin user bằng email (dùng cho login thường & Google)
+
     public static function findByEmail($email)
     {
         $db = Connection::get();
@@ -19,15 +16,10 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-
-    /* ============================
-       2. TẠO USER ĐĂNG KÝ THƯỜNG
-    ============================ */
-    // Tạo user mới từ form đăng ký
     public static function create($full_name, $email, $password_hash)
     {
         $db = Connection::get();
-        $role_id = 2; // Mặc định Customer
+        $role_id = 2;
 
         $sql = "INSERT INTO user (full_name, email, password_hash, role_id, created_at) 
                 VALUES (:name, :email, :pass, :role, NOW())";
@@ -43,11 +35,6 @@ class User
         return $db->lastInsertId();
     }
 
-
-    /* ============================
-       3. CẬP NHẬT GOOGLE ID + AVATAR
-    ============================ */
-    // Dùng khi user đã có tài khoản thường, giờ login bằng Google
     public static function updateGoogleInfo($user_id, $google_id, $avatar_url)
     {
         $db = Connection::get();
@@ -65,11 +52,6 @@ class User
         ]);
     }
 
-
-    /* ============================
-       4. TẠO USER MỚI BẰNG GOOGLE
-    ============================ */
-    // Tự động tạo user khi đăng nhập Google lần đầu
     public static function createGoogleUser($fullName, $email, $google_id, $avatar_url)
     {
         $db = Connection::get();
@@ -90,7 +72,6 @@ class User
         return $db->lastInsertId();
     }
 
-    /* 5. Cập nhật thông tin user (full_name, phone, address, avatar) */
     public static function updateUser($user_id, $data)
     {
         $db = Connection::get();
@@ -123,6 +104,32 @@ class User
     {
         $db = Connection::get();
         $stmt = $db->query("SELECT * FROM user");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function newUsers()
+    {
+        $db = Connection::get();
+
+        $sql = "
+            SELECT 
+                user_id,
+                full_name,
+                email,
+                phone,
+                address,
+                avatar_url,
+                role_id,
+                created_at
+            FROM user
+            WHERE 
+                is_deleted = 0
+                AND MONTH(created_at) = MONTH(CURRENT_DATE())
+                AND YEAR(created_at) = YEAR(CURRENT_DATE())
+            ORDER BY created_at DESC
+        ";  
+
+        $stmt = $db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

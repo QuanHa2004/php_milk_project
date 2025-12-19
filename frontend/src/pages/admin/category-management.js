@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import CategoryList from "../../component/admin/category-list";
 
 export default function CategoryManagement() {
-  // Điều hướng sang trang khác
   const navigate = useNavigate();
 
   return (

@@ -2,37 +2,31 @@ import SideBar from "../../component/admin/side-bar";
 import { useNavigate } from "react-router-dom";
 import { useState, useCallback, useEffect } from "react";
 
-// Khởi tạo dòng nhập hàng mới
 const createNewItem = (id) => ({
-    id: id, // Dùng để quản lý trong React, không gửi lên server
+    id: id, 
     product_id: "",
     variant_id: "",
     quantity: "",
-    price: "", // import_price
+    price: "", 
     expiration_date: "",
-    manufacturing_date: "", // Tùy chọn
+    manufacturing_date: "", 
     error: ""
 });
 
 export default function AddInvoice() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Dữ liệu danh sách cần thiết
-    const [products, setProducts] = useState([]); // Sản phẩm & Variants
+    const [products, setProducts] = useState([]); 
     const [suppliers, setSuppliers] = useState([]);
-    const [lastItemId, setLastItemId] = useState(0); // Dùng để tạo key duy nhất
+    const [lastItemId, setLastItemId] = useState(0); 
 
-    // 1. Dữ liệu chung của Hóa đơn
     const [formData, setFormData] = useState({
-        supplier_id: "", // Lấy ID thay vì Name
+        supplier_id: "", 
         note: ""
     });
 
-    // 2. Dữ liệu chi tiết từng mặt hàng nhập (Mảng)
     const [invoiceItems, setInvoiceItems] = useState([createNewItem(1)]);
 
-    // --- Fetch Data ---
     const fetchList = useCallback(async (url, setter) => {
         try {
             const res = await fetch(url);
@@ -45,42 +39,34 @@ export default function AddInvoice() {
     }, []);
 
     useEffect(() => {
-        // Lưu ý: Endpoint `products` cần trả về cả Variants để lọc
         fetchList("http://localhost:8000/admin/products?include_variants=true", setProducts);
         fetchList("http://localhost:8000/admin/suppliers", setSuppliers);
     }, [fetchList]);
 
-    // --- Handlers ---
     const handleInvoiceChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    // Hàm thêm một dòng nhập hàng mới
     const handleAddItem = () => {
         setLastItemId(prev => prev + 1);
         setInvoiceItems(prev => [...prev, createNewItem(lastItemId + 1)]);
     };
 
-    // Hàm xóa một dòng nhập hàng
     const handleRemoveItem = (id) => {
         if (invoiceItems.length > 1) {
             setInvoiceItems(prev => prev.filter(item => item.id !== id));
         }
     };
 
-    // Hàm xử lý thay đổi chi tiết từng dòng nhập
     const handleItemChange = (id, name, value) => {
         setInvoiceItems(prevItems => prevItems.map(item => {
             if (item.id === id) {
                 let newItem = { ...item, [name]: value };
 
-                // Xử lý logic khi chọn Product_ID
                 if (name === 'product_id') {
-                    // Reset variant_id khi chọn lại product_id
                     newItem.variant_id = "";
                 }
 
-                // Đảm bảo quantity và price là số dương
                 if (name === 'quantity' || name === 'price') {
                     const numberValue = Math.max(0, parseInt(value) || 0);
                     newItem[name] = numberValue;
@@ -92,7 +78,6 @@ export default function AddInvoice() {
         }));
     };
 
-    // --- Submission ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -101,7 +86,6 @@ export default function AddInvoice() {
             sum + (parseFloat(item.quantity) * parseFloat(item.price)), 0
         );
 
-        // Chuẩn bị dữ liệu gửi lên
         const payload = {
             supplier_id: formData.supplier_id,
             note: formData.note,
@@ -115,7 +99,6 @@ export default function AddInvoice() {
             }))
         };
 
-        // Kiểm tra validation cơ bản
         if (!payload.supplier_id || payload.items.some(item =>
             !item.variant_id || item.quantity <= 0 || item.price <= 0 || !item.expiration_date
         )) {
@@ -144,7 +127,6 @@ export default function AddInvoice() {
         }
     };
 
-    // Lấy danh sách variants của một sản phẩm
     const getVariantsByProductId = (productId) => {
         const product = products.find(p => p.product_id === parseInt(productId));
         return product?.variants || [];
@@ -173,7 +155,6 @@ export default function AddInvoice() {
                             <div className="bg-white dark:bg-[#292524] rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-8">
                                 <form onSubmit={handleSubmit} className="space-y-8">
 
-                                    {/* PHẦN 1: THÔNG TIN CHUNG HÓA ĐƠN */}
                                     <div>
                                         <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
                                             <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
@@ -183,7 +164,6 @@ export default function AddInvoice() {
                                         </h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Chọn Nhà cung cấp (Bắt buộc phải là ID) */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Nhà cung cấp <span className="text-red-500">*</span></span>
                                                 <select
@@ -202,7 +182,6 @@ export default function AddInvoice() {
                                                 </select>
                                             </label>
 
-                                            {/* Ghi chú chung */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Ghi chú chung</span>
                                                 <input
@@ -218,7 +197,6 @@ export default function AddInvoice() {
                                         </div>
                                     </div>
 
-                                    {/* PHẦN 2: CHI TIẾT CÁC LÔ HÀNG (Dạng lặp lại) */}
                                     <div className="pt-6 border-t border-stone-100 dark:border-stone-700">
                                         <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
                                             <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
@@ -231,7 +209,6 @@ export default function AddInvoice() {
                                             <div key={item.id} className="border border-stone-200 dark:border-stone-700 rounded-lg p-6 mb-4 relative">
                                                 <p className="font-bold text-stone-600 dark:text-stone-300 mb-4">Mặt hàng #{index + 1}</p>
 
-                                                {/* Nút xóa */}
                                                 {invoiceItems.length > 1 && (
                                                     <button
                                                         type="button"
@@ -245,7 +222,6 @@ export default function AddInvoice() {
 
                                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                                                    {/* Chọn Sản phẩm */}
                                                     <label className="flex flex-col w-full gap-2 md:col-span-2">
                                                         <span className="label-text">Sản phẩm <span className="text-red-500">*</span></span>
                                                         <select
@@ -263,7 +239,6 @@ export default function AddInvoice() {
                                                         </select>
                                                     </label>
 
-                                                    {/* Chọn Biến thể (Variants) */}
                                                     <label className="flex flex-col w-full gap-2 md:col-span-2">
                                                         <span className="label-text">Biến thể (Quy cách) <span className="text-red-500">*</span></span>
                                                         <select
@@ -282,7 +257,6 @@ export default function AddInvoice() {
                                                         </select>
                                                     </label>
 
-                                                    {/* Số lượng */}
                                                     <label className="flex flex-col w-full gap-2">
                                                         <span className="label-text">Số lượng nhập <span className="text-red-500">*</span></span>
                                                         <input
@@ -296,7 +270,6 @@ export default function AddInvoice() {
                                                         />
                                                     </label>
 
-                                                    {/* Giá nhập */}
                                                     <label className="flex flex-col w-full gap-2">
                                                         <span className="label-text">Giá nhập/đơn vị (VNĐ) <span className="text-red-500">*</span></span>
                                                         <input
@@ -310,7 +283,6 @@ export default function AddInvoice() {
                                                         />
                                                     </label>
 
-                                                    {/* Hạn sử dụng */}
                                                     <label className="flex flex-col w-full gap-2">
                                                         <span className="label-text">Hạn sử dụng (Lô hàng) <span className="text-red-500">*</span></span>
                                                         <input
@@ -322,7 +294,6 @@ export default function AddInvoice() {
                                                         />
                                                     </label>
 
-                                                    {/* Ngày sản xuất (Tùy chọn) */}
                                                     <label className="flex flex-col w-full gap-2">
                                                         <span className="label-text">Ngày sản xuất (Tùy chọn)</span>
                                                         <input
@@ -347,7 +318,6 @@ export default function AddInvoice() {
                                         </button>
                                     </div>
 
-                                    {/* PHẦN 3: ACTION */}
                                     <div className="flex justify-end gap-4 pt-4 border-t border-stone-100 dark:border-stone-700">
                                         <button
                                             type="button"

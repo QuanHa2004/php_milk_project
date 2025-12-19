@@ -8,10 +8,6 @@ use PDO;
 class Category
 {
 
-    /* ============================
-       1. LẤY TẤT CẢ DANH MỤC
-    ============================ */
-    // Trả về danh sách toàn bộ category
     public static function all()
     {
         $db = Connection::get();
@@ -19,10 +15,6 @@ class Category
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ============================
-       2. TẠO DANH MỤC MỚI
-    ============================ */
-    // Thêm danh mục mới và trả về ID
     public static function create($name)
     {
         $db = Connection::get();
@@ -34,10 +26,6 @@ class Category
         return $db->lastInsertId();
     }
 
-    /* ============================
-       3. KIỂM TRA DANH MỤC TỒN TẠI
-    ============================ */
-    // Kiểm tra tên danh mục đã tồn tại chưa
     public static function exists($name)
     {
         $db = Connection::get();

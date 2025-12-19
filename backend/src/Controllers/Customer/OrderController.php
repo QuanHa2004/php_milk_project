@@ -14,9 +14,6 @@ class OrderController
 {
     private $user_id;
 
-    /* ============================
-       1. XÁC THỰC NGƯỜI DÙNG
-    ============================ */
     private function authenticate()
     {
         $auth = new AuthController();
@@ -28,16 +25,10 @@ class OrderController
         }
     }
 
-
-    /* ============================
-       2. TẠO ĐƠN HÀNG (CHECKOUT)
-    ============================ */
-    // Xử lý đặt hàng + thanh toán (COD / VNPay)
     public function checkout($data)
     {
-        $this->authenticate(); // Lấy user_id
+        $this->authenticate();
 
-        // LẤY THÔNG TIN NGƯỜI DÙNG TỪ DATABASE QUA currentUser()
         $auth = new AuthController();
         $user = $auth->currentUser();
 
@@ -45,17 +36,14 @@ class OrderController
         $phone     = $user['phone'];
         $address   = $user['address'];
 
-        // FRONTEND CHỈ GỬI payment_method
         if (empty($data['payment_method'])) {
             Response::json(['error' => 'Thiếu phương thức thanh toán'], 400);
         }
 
-        // Kiểm tra thông tin người nhận
         if (!$full_name || !$phone || !$address) {
             Response::json(['error' => 'Vui lòng cung cấp đầy đủ số điện thoại, địa chỉ'], 400);
         }
 
-        // Lấy giỏ hàng
         $cart = Cart::getCartByUserId($this->user_id);
         if (!$cart) Response::json(['error' => 'Giỏ hàng trống'], 400);
 
@@ -70,7 +58,7 @@ class OrderController
         $db->beginTransaction();
 
         try {
-            // Tạo đơn hàng
+
             $order_id = Order::create([
                 'user_id'        => $this->user_id,
                 'full_name'      => $full_name,
@@ -82,17 +70,14 @@ class OrderController
                 'note'           => $data['note'] ?? ''
             ]);
 
-            // Chi tiết đơn + trừ kho
             foreach ($items_to_buy as $item) {
 
-                // 🔒 BẮT BUỘC PHẢI CÓ BATCH
                 if (empty($item['batch_id'])) {
                     throw new \Exception(
                         "Cart item thiếu batch_id (variant {$item['variant_id']})"
                     );
                 }
 
-                // 1️⃣ Lưu chi tiết đơn hàng
                 Order::addDetail([
                     'order_id'   => $order_id,
                     'variant_id' => $item['variant_id'],
@@ -101,7 +86,6 @@ class OrderController
                     'quantity'   => $item['quantity']
                 ]);
 
-                // 2️⃣ Trừ kho theo đúng batch
                 if (!Product::decreaseStock(
                     $item['variant_id'],
                     $item['quantity'],
@@ -121,8 +105,6 @@ class OrderController
                 }
             }
 
-
-            // Xử lý thanh toán
             if ($data['payment_method'] === 'VNPAY') {
                 $db->commit();
 
@@ -140,7 +122,6 @@ class OrderController
                 ]);
             }
 
-            // COD
             Order::addPaymentLog($order_id, 'COD', $total_amount, 'SUCCESS');
             $db->commit();
 
@@ -154,11 +135,6 @@ class OrderController
         }
     }
 
-
-    /* ============================
-       3. THANH TOÁN LẠI ĐƠN HÀNG
-    ============================ */
-    // Tạo link thanh toán lại cho đơn Pending/Cancelled
     public function retryPayment($data)
     {
         $this->authenticate();
@@ -173,19 +149,16 @@ class OrderController
         try {
             $db->beginTransaction();
 
-            // 1. Lấy đơn hàng
             $order = Order::find($order_id);
 
             if (!$order || $order['user_id'] != $this->user_id) {
                 Response::json(['error' => 'Đơn hàng không tồn tại hoặc không hợp lệ'], 404);
             }
 
-            // Chỉ cho phép retry nếu đơn Pending hoặc Cancelled
             if (!in_array($order['status'], ['pending', 'cancelled'])) {
                 Response::json(['error' => 'Đơn hàng này không thể thanh toán lại'], 400);
             }
 
-            // 2. Trừ kho lại
             $orderDetails = Order::getDetails($order_id);
 
             foreach ($orderDetails as $item) {
@@ -198,13 +171,11 @@ class OrderController
                 }
             }
 
-            // 3. Cập nhật trạng thái đơn hàng
             $stmt = $db->prepare("UPDATE `orders` SET status = 'pending', payment_method = 'VNPAY' WHERE order_id = :id");
             $stmt->execute(['id' => $order_id]);
 
             $db->commit();
 
-            // 4. Tạo link thanh toán mới
             $paymentCtrl = new PaymentController();
             $paymentData = [
                 'order_id'   => $order_id,
@@ -228,6 +199,8 @@ class OrderController
     {
         $this->authenticate();
         $orders = Order::getOrdersByUserId($this->user_id);
-        return Response::json($orders ?: [], 200);
+        Response::json([
+            'data' => $orders ?: []
+        ], 200);
     }
 }

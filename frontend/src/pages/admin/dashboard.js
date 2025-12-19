@@ -2,20 +2,35 @@ import SideBar from "../../component/admin/side-bar";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  // Lưu dữ liệu báo cáo tổng quan
   const [report, setReport] = useState({
     total_revenue: 0,
     total_orders: 0,
     new_customer: 0,
-    avg_value: 0
   });
 
   useEffect(() => {
-    fetch("http://localhost:8000/admin/reports")
-      .then((res) => res.json())
-      .then((data) => {
-        setReport(data);
-      });
+    const fetchReport = async () => {
+      try {
+        const revenueRes = await fetch("http://localhost:8000/admin/total-revenue");
+        const revenueJson = await revenueRes.json();
+
+        const customerRes = await fetch("http://localhost:8000/admin/new-customer");
+        const customerJson = await customerRes.json();
+
+        const revenueData = revenueJson.data || {};
+        const customerData = customerJson.data || [];
+
+        setReport({
+          total_revenue: revenueData.total_revenue ?? 0,
+          total_orders: revenueData.total_orders ?? 0,
+          new_customer: customerData.length,
+        });
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu báo cáo:", error);
+      }
+    };
+
+    fetchReport();
   }, []);
 
   return (
@@ -26,7 +41,6 @@ export default function Dashboard() {
 
       <main className="flex-1 p-8 w-full overflow-hidden">
         <div className="flex flex-col gap-8 max-w-7xl mx-auto">
-
           <div className="flex min-w-72 flex-col gap-1">
             <p className="text-stone-800 dark:text-stone-100 text-3xl font-black tracking-tight">
               Bảng điều khiển
@@ -37,7 +51,6 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
             <div className="group relative flex flex-col gap-4 rounded-2xl p-6 bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-amber-900/10 hover:-translate-y-1 transition-all duration-300">
               <div>
                 <p className="text-stone-500 dark:text-stone-400 text-sm font-medium mb-1">
@@ -70,18 +83,6 @@ export default function Dashboard() {
                 </h3>
               </div>
             </div>
-
-            <div className="group relative flex flex-col gap-4 rounded-2xl p-6 bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-amber-900/10 hover:-translate-y-1 transition-all duration-300">
-              <div>
-                <p className="text-stone-500 dark:text-stone-400 text-sm font-medium mb-1">
-                  Giá trị trung bình/đơn
-                </p>
-                <h3 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-                  {Number(report.avg_value).toLocaleString('vi-VN')}
-                </h3>
-              </div>
-            </div>
-
           </div>
         </div>
       </main>

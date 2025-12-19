@@ -10,10 +10,6 @@ class UserController
 {
     private $user_id;
 
-    /* ============================
-       1. XÁC THỰC NGƯỜI DÙNG
-    ============================ */
-    // Lấy user_id từ token
     private function authenticate()
     {
         $auth = new AuthController();
@@ -30,7 +26,7 @@ class UserController
         $this->authenticate();
 
         if (!$data) {
-            Response::json(["error" => "Invalid JSON"], 400);
+            Response::json(["error" => "Không có dữ liệu"], 400);
         }
 
         $updateData = [];
@@ -47,17 +43,13 @@ class UserController
             $updateData["address"] = $data["address"];
         }
 
-        if (empty($updateData)) {
-            Response::json(["error" => "No data to update"], 400);
-        }
-
         $updated = User::updateUser($this->user_id, $updateData);
 
         if ($updated > 0) {
-            Response::json(["message" => "Updated successfully"], 200);
+            Response::json(["message" => "Cập nhật thành công"], 200);
         } else {
             Response::json([
-                "message" => "No changes detected"
+                "message" => "Không thay đổi"
             ], 200);
         }
     }

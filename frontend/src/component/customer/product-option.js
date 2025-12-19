@@ -14,16 +14,15 @@ export default function ProductOption() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:8000/categories");
+        const res = await fetch("http://localhost:8000/admin/categories");
 
         if (!res.ok) {
           throw new Error("Lỗi kết nối server");
         }
 
         const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setCategoryList(data);
+        if (Array.isArray(data.data)) {
+          setCategoryList(data.data);
         } else {
           setCategoryList([]);
         }
@@ -117,8 +116,8 @@ export default function ProductOption() {
                           {product.product_name}
                         </p>
 
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Số lượng còn: {product.total_quantity}
+                        <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-3">
+                          {product.description}
                         </p>
                       </div>
                     </div>

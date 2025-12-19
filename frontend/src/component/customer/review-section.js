@@ -6,7 +6,7 @@ export default function ReviewSection({ product_id, currentVariant }) {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
 
-    useEffect(() => {
+    const fetchReviews = () => {
         if (!product_id || !currentVariant?.variant_id) return;
 
         fetch(`http://localhost:8000/reviews/${product_id}/${currentVariant.variant_id}`)
@@ -15,7 +15,11 @@ export default function ReviewSection({ product_id, currentVariant }) {
                 setReviews(data.data || []);
             })
             .catch(err => console.error("Lỗi tải đánh giá:", err));
-    }, [product_id, currentVariant]);
+    };
+
+    useEffect(() => {
+        fetchReviews();
+    }, [product_id, currentVariant?.variant_id]);
 
     const handleSubmitReview = async () => {
         if (!rating) {
@@ -56,9 +60,10 @@ export default function ReviewSection({ product_id, currentVariant }) {
                 throw new Error(data.message || "Gửi đánh giá thất bại");
             }
 
+            fetchReviews();
+
             alert("Cảm ơn bạn đã đánh giá sản phẩm");
 
-            // Reset form
             setRating(0);
             setComment("");
 

@@ -10,10 +10,6 @@ class CartController
 {
     private $user_id;
 
-    /* ============================
-       1. XÁC THỰC NGƯỜI DÙNG
-    ============================ */
-    // Lấy user_id từ token
     private function authenticate()
     {
         $auth = new AuthController();
@@ -25,12 +21,6 @@ class CartController
         }
     }
 
-
-    /* ============================
-       2. THÊM / XÓA / CẬP NHẬT GIỎ HÀNG
-    ============================ */
-
-    // Add an item to the authenticated user's cart
     public function add($data)
     {
         $this->authenticate();
@@ -41,7 +31,6 @@ class CartController
 
         $cart_id = Cart::findOrCreate($this->user_id);
 
-        // batch_id có thể gửi từ frontend, nếu không có → null
         $batch_id = $data['batch_id'];
 
         Cart::addItem($cart_id, $data['variant_id'], $data['quantity'], $batch_id);
@@ -55,7 +44,6 @@ class CartController
         ]);
     }
 
-    // Remove an item from the authenticated user's cart
     public function remove($data)
     {
         $this->authenticate();
@@ -80,8 +68,6 @@ class CartController
         }
     }
 
-
-    // Update quantity for a cart item
     public function update($data)
     {
         $this->authenticate();
@@ -107,13 +93,6 @@ class CartController
         Response::json(['message' => 'Cập nhật thành công']);
     }
 
-
-
-    /* ============================
-       3. LẤY GIỎ HÀNG HIỆN TẠI
-    ============================ */
-
-    // Retrieve the authenticated user's cart and compute totals
     public function myCart()
     {
         $this->authenticate();
@@ -144,20 +123,13 @@ class CartController
             $total_price += $total;
 
             $items[] = [
-                // ====== KHÓA CHÍNH ======
                 'variant_id'     => (int)$ci['variant_id'],
                 'batch_id'       => $ci['batch_id'] !== null ? (int)$ci['batch_id'] : null,
-
-                // ====== SẢN PHẨM ======
                 'product_id'     => (int)$ci['product_id'],
                 'product_name'   => $ci['product_name'],
                 'image_url'      => $ci['image_url'],
-
-                // ====== BIẾN THỂ ======
                 'volume'         => $ci['volume'],
                 'packaging_type' => $ci['packaging_type'],
-
-                // ====== GIÁ ======
                 'price'          => $price,
                 'quantity'       => $qty,
                 'is_checked'     => (bool)$ci['is_checked'],
@@ -173,14 +145,6 @@ class CartController
         ]);
     }
 
-
-
-
-    /* ============================
-       4. CẬP NHẬT TRẠNG THÁI CHỌN SẢN PHẨM
-    ============================ */
-
-    // Toggle checked status for a cart item
     public function updateItemStatus($variant_id, $data)
     {
         $this->authenticate();

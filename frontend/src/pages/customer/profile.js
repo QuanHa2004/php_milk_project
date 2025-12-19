@@ -61,11 +61,13 @@ export default function Profile() {
             }
 
             const data = await res.json();
-            setOrders(data);
+            setOrders(Array.isArray(data.data) ? data.data : []);
         } catch (err) {
             console.error(err);
+            setOrders([]);
         }
     };
+
 
     // Hàm cập nhật thông tin người dùng
     const handleUpdateUser = async () => {
@@ -83,20 +85,20 @@ export default function Profile() {
                 alert("Cập nhật không thành công!");
                 return;
             }
-            
+
             const data = await res.json();
 
-            if(res.status === 200 && data.message === "Updated successfully"){
+            if (res.status === 200 && data.message === "Updated successfully") {
                 console.log("Cập nhật thông tin thành công!")
                 alert("Cập nhật thông tin thành công!");
             }
 
-            if(res.status === 200 && data.message === "No changes detected"){
+            if (res.status === 200 && data.message === "No changes detected") {
                 console.log("Không có thay đổi")
                 alert("Không có thay đổi");
             }
 
-            
+
             setIsEditing(false);
         } catch (err) {
             console.error(err);

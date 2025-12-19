@@ -8,38 +8,35 @@ use Exception;
 
 class Product
 {
-    /* ============================
-       1. LẤY TẤT CẢ SẢN PHẨM
-    ============================ */
-    // Trả về danh sách sản phẩm (kèm tên danh mục)
+
     public static function all_1()
     {
         $db = Connection::get();
 
         $sql = "
-        SELECT 
-            p.product_id,
-            p.product_name,
-            p.category_id,
-            c.category_name,
-            p.image_url,
-            p.description,
-            p.created_at,
-            p.is_hot,
+            SELECT 
+                p.product_id,
+                p.product_name,
+                p.category_id,
+                c.category_name,
+                p.image_url,
+                p.description,
+                p.created_at,
+                p.is_hot,
 
-            COALESCE(MIN(v.price), 0) AS min_price,
-            COALESCE(SUM(v.stock_quantity), 0) AS total_quantity
+                COALESCE(MIN(v.price), 0) AS min_price,
+                COALESCE(SUM(v.stock_quantity), 0) AS total_quantity
 
-        FROM product p
-        LEFT JOIN category c 
-               ON p.category_id = c.category_id
-        LEFT JOIN product_variant v 
-               ON p.product_id = v.product_id
-               AND v.is_active = 1
-        WHERE p.is_deleted = 0
-        GROUP BY p.product_id
-        ORDER BY p.product_id DESC
-    ";
+            FROM product p
+            LEFT JOIN category c 
+                ON p.category_id = c.category_id
+            LEFT JOIN product_variant v 
+                ON p.product_id = v.product_id
+                AND v.is_active = 1
+            WHERE p.is_deleted = 0
+            GROUP BY p.product_id
+            ORDER BY p.product_id DESC
+        ";
 
         return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -50,7 +47,7 @@ class Product
         $db = Connection::get();
 
         $sql = "
-                SELECT 
+            SELECT 
                 p.product_id,
                 p.product_name,
                 p.category_id,
@@ -59,74 +56,69 @@ class Product
                 p.description,
                 p.is_hot,
 
-                -- Tổng tồn kho (từ batch)
-                (
-                    SELECT SUM(pb.quantity)
-                    FROM product_variant pv
-                    JOIN product_batch pb ON pb.variant_id = pv.variant_id
-                    WHERE pv.product_id = p.product_id
-                    AND pv.is_active = 1
-                ) AS total_stock,
+            (
+                SELECT SUM(pb.quantity)
+                FROM product_variant pv
+                JOIN product_batch pb ON pb.variant_id = pv.variant_id
+                WHERE pv.product_id = p.product_id
+                AND pv.is_active = 1
+            ) AS total_stock,
 
-                -- Khoảng giá
-                (
-                    SELECT MIN(price)
-                    FROM product_variant
-                    WHERE product_id = p.product_id AND is_active = 1
-                ) AS min_price,
+            (
+                SELECT MIN(price)
+                FROM product_variant
+                WHERE product_id = p.product_id AND is_active = 1
+            ) AS min_price,
 
-                (
-                    SELECT MAX(price)
-                    FROM product_variant
-                    WHERE product_id = p.product_id AND is_active = 1
-                ) AS max_price,
+            (
+                SELECT MAX(price)
+                FROM product_variant
+                WHERE product_id = p.product_id AND is_active = 1
+            ) AS max_price,
 
-                -- DANH SÁCH VARIANT + BATCH
-                (
-                    SELECT JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'variant_id', pv.variant_id,
-                            'variant_name', COALESCE(pv.variant_name, CONCAT(pv.packaging_type, ' ', pv.volume)),
-                            'packaging_type', pv.packaging_type,
-                            'volume', pv.volume,
-                            'price', pv.price,
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'variant_id', pv.variant_id,
+                        'variant_name', COALESCE(pv.variant_name, CONCAT(pv.packaging_type, ' ', pv.volume)),
+                        'packaging_type', pv.packaging_type,
+                        'volume', pv.volume,
+                        'price', pv.price,
 
-                            -- Tồn kho theo variant
-                            'stock_quantity', (
-                                SELECT SUM(pb.quantity)
-                                FROM product_batch pb
-                                WHERE pb.variant_id = pv.variant_id
-                            ),
+                        -- Tồn kho theo variant
+                        'stock_quantity', (
+                            SELECT SUM(pb.quantity)
+                            FROM product_batch pb
+                            WHERE pb.variant_id = pv.variant_id
+                        ),
 
-                            -- DANH SÁCH BATCH
-                            'batches', (
-                                SELECT JSON_ARRAYAGG(
-                                    JSON_OBJECT(
-                                        'batch_id', pb.batch_id,
-                                        'quantity', pb.quantity,
-                                        'manufacturing_date', pb.manufacturing_date,
-                                        'expiration_date', pb.expiration_date
-                                    )
+                        'batches', (
+                            SELECT JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    'batch_id', pb.batch_id,
+                                    'quantity', pb.quantity,
+                                    'manufacturing_date', pb.manufacturing_date,
+                                    'expiration_date', pb.expiration_date
                                 )
-                                FROM product_batch pb
-                                WHERE pb.variant_id = pv.variant_id
                             )
+                            FROM product_batch pb
+                            WHERE pb.variant_id = pv.variant_id
                         )
                     )
-                    FROM product_variant pv
-                    WHERE pv.product_id = p.product_id
-                    AND pv.is_active = 1
-                ) AS variants
+                )
+                FROM product_variant pv
+                WHERE pv.product_id = p.product_id
+                AND pv.is_active = 1
+            ) AS variants
 
-                FROM product p
-                LEFT JOIN category c ON p.category_id = c.category_id
-                WHERE p.is_deleted = 0
-                ORDER BY p.product_id DESC
-                ";
+            FROM product p
+            LEFT JOIN category c ON p.category_id = c.category_id
+            WHERE p.is_deleted = 0
+            ORDER BY p.product_id DESC
+        ";
 
         $result = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-        // Decode JSON
         foreach ($result as &$row) {
             $row['variants'] = $row['variants']
                 ? json_decode($row['variants'], true)
@@ -136,37 +128,31 @@ class Product
         return $result;
     }
 
-
-
-    /* ============================
-       2. LẤY SẢN PHẨM THEO DANH MỤC
-    ============================ */
-    // Lấy danh sách sản phẩm theo category_id
     public static function getByCategory($category_id)
     {
         $db = Connection::get();
 
         $sql = "
-        SELECT 
-            p.product_id,
-            p.product_name,
-            p.category_id,
-            c.category_name,
-            p.image_url,
-            p.description,
-            p.created_at,
-            p.is_hot,
-            COALESCE(SUM(pv.stock_quantity), 0) AS total_quantity
-        FROM product p
-        LEFT JOIN category c ON p.category_id = c.category_id
-        LEFT JOIN product_variant pv 
-               ON p.product_id = pv.product_id
-               AND pv.is_active = 1
-        WHERE p.category_id = :category_id
-          AND p.is_deleted = 0
-        GROUP BY p.product_id
-        ORDER BY p.product_id DESC
-    ";
+            SELECT 
+                p.product_id,
+                p.product_name,
+                p.category_id,
+                c.category_name,
+                p.image_url,
+                p.description,
+                p.created_at,
+                p.is_hot,
+                COALESCE(SUM(pv.stock_quantity), 0) AS total_quantity
+            FROM product p
+            LEFT JOIN category c ON p.category_id = c.category_id
+            LEFT JOIN product_variant pv 
+                ON p.product_id = pv.product_id
+                AND pv.is_active = 1
+            WHERE p.category_id = :category_id
+            AND p.is_deleted = 0
+            GROUP BY p.product_id
+            ORDER BY p.product_id DESC
+        ";
 
         $stmt = $db->prepare($sql);
         $stmt->execute(['category_id' => $category_id]);
@@ -174,29 +160,20 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
-    /* ============================
-       3. LẤY CHI TIẾT SẢN PHẨM
-    ============================ */
-    // Lấy thông tin sản phẩm + product_detail
     public static function find($product_id)
     {
         $db = Connection::get();
 
-        // =================================================================
-        // BƯỚC 1: Lấy thông tin chung sản phẩm và chi tiết (Giữ nguyên)
-        // =================================================================
         $sql = "
-        SELECT 
-            p.*, 
-            pd.origin, pd.ingredients, pd.`usage`, pd.storage,
-            pd.calories, pd.protein, pd.fat, pd.carbohydrates, pd.sugar,
-            pd.vitamins, pd.minerals, pd.other_nutrients
-        FROM product p
-        LEFT JOIN product_detail pd ON p.product_id = pd.product_id
-        WHERE p.product_id = :product_id AND p.is_deleted = 0
-    ";
+            SELECT 
+                p.*, 
+                pd.origin, pd.ingredients, pd.`usage`, pd.storage,
+                pd.calories, pd.protein, pd.fat, pd.carbohydrates, pd.sugar,
+                pd.vitamins, pd.minerals, pd.other_nutrients
+            FROM product p
+            LEFT JOIN product_detail pd ON p.product_id = pd.product_id
+            WHERE p.product_id = :product_id AND p.is_deleted = 0
+        ";
 
         $stmt = $db->prepare($sql);
         $stmt->execute(['product_id' => $product_id]);
@@ -204,21 +181,18 @@ class Product
 
         if (!$product) return null;
 
-        // =================================================================
-        // BƯỚC 2: Lấy danh sách các biến thể (Variants) (Giữ nguyên)
-        // =================================================================
         $sqlVariants = "
-        SELECT 
-            v.variant_id, 
-            v.variant_name, 
-            v.volume, 
-            v.packaging_type, 
-            v.price, 
-            v.stock_quantity
-        FROM product_variant v
-        WHERE v.product_id = :product_id AND v.is_active = 1
-        ORDER BY v.price ASC
-    ";
+            SELECT 
+                v.variant_id, 
+                v.variant_name, 
+                v.volume, 
+                v.packaging_type, 
+                v.price, 
+                v.stock_quantity
+            FROM product_variant v
+            WHERE v.product_id = :product_id AND v.is_active = 1
+            ORDER BY v.price ASC
+        ";
 
         $stmtVariants = $db->prepare($sqlVariants);
         $stmtVariants->execute(['product_id' => $product_id]);
@@ -230,46 +204,30 @@ class Product
             return $product;
         }
 
-        // =================================================================
-        // BƯỚC 3: TỐI ƯU - Lấy Batch cho TẤT CẢ variant chỉ bằng 1 query
-        // =================================================================
-
-        // 3.1. Lấy danh sách tất cả variant_id
         $variantIds = array_column($variants, 'variant_id');
 
-        // 3.2. Tạo chuỗi placeholder (?,?,?) cho câu lệnh SQL IN
         $placeholders = str_repeat('?,', count($variantIds) - 1) . '?';
 
-        // 3.3. Truy vấn lấy tất cả batch còn hàng của các variant này
-        // Sắp xếp theo Expiration Date tăng dần để lô hết hạn trước lên đầu
         $sqlBatch = "
-        SELECT batch_id, variant_id, quantity, expiration_date
-        FROM product_batch
-        WHERE variant_id IN ($placeholders) AND quantity > 0
-        ORDER BY expiration_date ASC, batch_id ASC
-    ";
+            SELECT batch_id, variant_id, quantity, expiration_date
+            FROM product_batch
+            WHERE variant_id IN ($placeholders) AND quantity > 0
+            ORDER BY expiration_date ASC, batch_id ASC
+        ";
 
         $stmtBatch = $db->prepare($sqlBatch);
         $stmtBatch->execute($variantIds);
         $allBatches = $stmtBatch->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3.4. Xử lý logic ghép Batch vào Variant ngay trong PHP (Nhanh hơn gọi DB nhiều lần)
-
-        // Tạo mảng tạm để lưu batch tốt nhất cho mỗi variant
-        // Key là variant_id, Value là thông tin batch
         $bestBatches = [];
 
         foreach ($allBatches as $batch) {
             $vId = $batch['variant_id'];
-            // Vì SQL đã ORDER BY expiration_date ASC, nên batch đầu tiên xuất hiện 
-            // trong vòng lặp chính là batch có HSD gần nhất (FIFO).
-            // Ta chỉ lấy cái đầu tiên, các cái sau bỏ qua.
             if (!isset($bestBatches[$vId])) {
                 $bestBatches[$vId] = $batch;
             }
         }
 
-        // 3.5. Gán thông tin batch vào mảng variants ban đầu
         foreach ($variants as &$variant) {
             $vId = $variant['variant_id'];
 
@@ -279,7 +237,6 @@ class Product
                 $variant['batch_quantity'] = $b['quantity'];
                 $variant['batch_expiration'] = $b['expiration_date'];
             } else {
-                // Trường hợp variant đó không có batch nào còn hàng
                 $variant['batch_id'] = null;
                 $variant['batch_quantity'] = 0;
                 $variant['batch_expiration'] = null;
@@ -290,34 +247,28 @@ class Product
         return $product;
     }
 
-
-
-    /* ============================
-       4. TÌM KIẾM SẢN PHẨM
-    ============================ */
-    // Tìm sản phẩm theo tên
     public static function searchByName($search_name)
     {
         $db = Connection::get();
         $search_name = trim($search_name);
 
         $sql = "
-        SELECT 
-            p.product_id,
-            p.product_name,
-            p.category_id,
-            p.image_url,
-            p.description,
-            p.is_hot,
-            MIN(v.price) AS min_price,
-            SUM(v.stock_quantity) AS total_quantity
-        FROM product p
-        LEFT JOIN product_variant v ON p.product_id = v.product_id
-        WHERE p.product_name LIKE :search_name
-          AND p.is_deleted = 0
-        GROUP BY p.product_id
-        ORDER BY p.product_id DESC
-    ";
+            SELECT 
+                p.product_id,
+                p.product_name,
+                p.category_id,
+                p.image_url,
+                p.description,
+                p.is_hot,
+                MIN(v.price) AS min_price,
+                SUM(v.stock_quantity) AS total_quantity
+            FROM product p
+            LEFT JOIN product_variant v ON p.product_id = v.product_id
+            WHERE p.product_name LIKE :search_name
+            AND p.is_deleted = 0
+            GROUP BY p.product_id
+            ORDER BY p.product_id DESC
+        ";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([
@@ -327,17 +278,10 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
-    /* ============================
-       5. CẬP NHẬT KHO (TĂNG / GIẢM)
-    ============================ */
-    // Cộng số lượng kho
     public static function increaseStock($variant_id, $quantity, $batch_id)
     {
         $db = Connection::get();
 
-        // 1. Trả lại số lượng cho batch
         $stmtBatch = $db->prepare("
         UPDATE product_batch
         SET quantity = quantity + :quantity
@@ -351,7 +295,6 @@ class Product
             return false;
         }
 
-        // 2. Trả lại tổng tồn kho cho variant
         $stmtVariant = $db->prepare("
         UPDATE product_variant
         SET stock_quantity = stock_quantity + :quantity
@@ -365,12 +308,10 @@ class Product
     }
 
 
-    // Trừ số lượng kho (chỉ trừ khi đủ hàng)
     public static function decreaseStock($variant_id, $quantity)
     {
         $db = Connection::get();
 
-        // Lấy batch còn hàng, hạn dùng sớm nhất
         $stmt = $db->prepare("
         SELECT batch_id, quantity
         FROM product_batch
@@ -402,10 +343,9 @@ class Product
         }
 
         if ($remain > 0) {
-            return false; // Không đủ hàng trong batch
+            return false; 
         }
 
-        // Cập nhật tổng tồn kho variant
         $db->prepare("
         UPDATE product_variant
         SET stock_quantity = stock_quantity - :quantity
@@ -418,19 +358,12 @@ class Product
         return true;
     }
 
-
-
-    /* ============================
-       6. TẠO SẢN PHẨM MỚI
-    ============================ */
-    // Tạo sản phẩm + product_detail trong transaction
     public static function create($data)
     {
         $db = Connection::get();
         $db->beginTransaction();
 
         try {
-            // 1️⃣ Insert bảng product
             $stmt = $db->prepare("
                 INSERT INTO product 
                 (product_name, category_id, manufacturer_id, image_url, description, is_hot)
@@ -478,30 +411,6 @@ class Product
             $db->rollBack();
             throw $e;
         }
-    }
-
-    public static function getVariantPrice($product_id, $volume, $packaging_type)
-    {
-        $db = Connection::get();
-
-        $sql = "
-        SELECT variant_id, price, stock_quantity 
-        FROM product_variant 
-        WHERE product_id = :product_id 
-        AND volume = :volume 
-        AND packaging_type = :packaging_type
-        AND is_active = 1
-        LIMIT 1
-    ";
-
-        $stmt = $db->prepare($sql);
-        $stmt->execute([
-            'product_id' => $product_id,
-            'volume' => $volume,
-            'packaging_type' => $packaging_type
-        ]);
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public static function updateStockQuantity($variant_id, $quantity)

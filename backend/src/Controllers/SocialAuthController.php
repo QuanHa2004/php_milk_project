@@ -11,7 +11,6 @@ class SocialAuthController
      /* ============================================
          1. CHUYỂN HƯỚNG NGƯỜI DÙNG SANG GOOGLE LOGIN
      ============================================ */
-     // Redirect user to Google's OAuth consent screen
      public function redirectToGoogle()
     {
 
@@ -36,7 +35,6 @@ class SocialAuthController
      /* ============================================
          2. GOOGLE CALLBACK – NHẬN CODE & LẤY USER INFO
      ============================================ */
-     // Handle Google OAuth callback, fetch user info and process login
      public function handleGoogleCallback()
     {
 
@@ -100,7 +98,6 @@ class SocialAuthController
      /* ============================================
          3. LOGIC CHUNG: LƯU USER + TẠO JWT TOKEN
      ============================================ */
-     // Create or update social user and issue a JWT token
      private function processSocialLogin($email, $name, $providerField, $socialId, $avatar = null)
     {
 

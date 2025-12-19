@@ -6,7 +6,6 @@ export default function CreatePromotion() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 1. Khởi tạo State (KHÔNG CÒN created_by)
     const [formData, setFormData] = useState({
         promo_code: "",
         description: "",
@@ -14,13 +13,12 @@ export default function CreatePromotion() {
         discount_value: "",
         max_discount_value: "",
         min_order_value: "",
-        max_uses: "",       // Số lượng mã tối đa
+        max_uses: "",       
         start_date: "",
         end_date: "",
         is_active: true
     });
 
-    // 2. Xử lý thay đổi input
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -29,21 +27,16 @@ export default function CreatePromotion() {
         }));
     };
 
-    // 3. Xử lý Submit Form
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // --- A. Kiểm tra Token đăng nhập ---
-        // Đảm bảo bạn đang lưu token với key là 'token' hoặc 'access_token' trong lúc login
         const token = localStorage.getItem('access_token');
 
         if (!token) {
             alert("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn!");
-            navigate("/login"); // Chuyển hướng trang login
+            navigate("/login");
             return;
         }
 
-        // --- B. Validate Client cơ bản ---
         if (new Date(formData.end_date) <= new Date(formData.start_date)) {
             alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
             return;
@@ -51,21 +44,16 @@ export default function CreatePromotion() {
 
         setIsSubmitting(true);
 
-        // --- C. Chuẩn hóa dữ liệu trước khi gửi ---
         const payload = {
             ...formData,
-            // Ép kiểu số
             discount_value: parseFloat(formData.discount_value),
             min_order_value: parseFloat(formData.min_order_value),
-            // Nếu là % thì lấy max_discount, nếu là fixed thì max = value
             max_discount_value: formData.discount_type === 'percent'
                 ? parseFloat(formData.max_discount_value)
                 : parseFloat(formData.discount_value),
 
-            // Xử lý max_uses (nếu rỗng thì gửi null)
             max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
             is_active: formData.is_active ? 1 : 0,
-            // Format ngày tháng: "2025-12-14T10:30" -> "2025-12-14 10:30:00"
             start_date: formData.start_date.replace('T', ' ') + ':00',
             end_date: formData.end_date.replace('T', ' ') + ':00',
         };
@@ -75,7 +63,6 @@ export default function CreatePromotion() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // --- D. QUAN TRỌNG: Gửi Token lên Server ---
                     "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
@@ -87,10 +74,9 @@ export default function CreatePromotion() {
                 alert("Tạo mã giảm giá thành công! 🎉");
                 navigate("/admin/promotion");
             } else {
-                // Xử lý lỗi từ Backend trả về
                 if (response.status === 401) {
                     alert("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-                    localStorage.removeItem('token'); // Xóa token cũ
+                    localStorage.removeItem('token'); 
                     navigate("/login");
                 } else {
                     alert(result.error || "Tạo mã thất bại!");
@@ -116,7 +102,7 @@ export default function CreatePromotion() {
                         <div className="w-full max-w-4xl mx-auto">
                             <div className="flex flex-col gap-1 mb-8">
                                 <p className="text-stone-800 dark:text-stone-100 text-3xl font-black tracking-tight">
-                                    Tạo mã giảm giá 🎟️
+                                    Tạo mã giảm giá 
                                 </p>
                                 <p className="text-stone-500 dark:text-stone-400 text-sm">
                                     Thiết lập các chương trình khuyến mãi mới cho cửa hàng.
@@ -126,7 +112,6 @@ export default function CreatePromotion() {
                             <div className="bg-white dark:bg-[#292524] rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-8">
                                 <form onSubmit={handleSubmit} className="space-y-8">
 
-                                    {/* --- NHÓM 1: THÔNG TIN CƠ BẢN --- */}
                                     <div>
                                         <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
                                             <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
@@ -136,7 +121,6 @@ export default function CreatePromotion() {
                                         </h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Mã Promo */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Mã giảm giá <span className="text-red-500">*</span></span>
                                                 <input
@@ -149,7 +133,6 @@ export default function CreatePromotion() {
                                                 />
                                             </label>
 
-                                            {/* Mô tả */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Mô tả ngắn</span>
                                                 <input
@@ -161,7 +144,6 @@ export default function CreatePromotion() {
                                                 />
                                             </label>
 
-                                            {/* Loại giảm giá */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Loại giảm giá</span>
                                                 <select
@@ -175,7 +157,6 @@ export default function CreatePromotion() {
                                                 </select>
                                             </label>
 
-                                            {/* Giá trị giảm */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">
                                                     {formData.discount_type === 'percent' ? 'Phần trăm giảm (%)' : 'Số tiền giảm (VNĐ)'} <span className="text-red-500">*</span>
@@ -194,7 +175,6 @@ export default function CreatePromotion() {
                                         </div>
                                     </div>
 
-                                    {/* --- NHÓM 2: ĐIỀU KIỆN ÁP DỤNG --- */}
                                     <div className="pt-6 border-t border-stone-100 dark:border-stone-700">
                                         <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
                                             <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
@@ -204,7 +184,6 @@ export default function CreatePromotion() {
                                         </h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Giảm tối đa (Chỉ hiện khi chọn %) */}
                                             {formData.discount_type === 'percent' && (
                                                 <label className="flex flex-col w-full gap-2">
                                                     <span className="label-text">Giảm tối đa (VNĐ) <span className="text-red-500">*</span></span>
@@ -221,7 +200,6 @@ export default function CreatePromotion() {
                                                 </label>
                                             )}
 
-                                            {/* Đơn tối thiểu */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Đơn tối thiểu (VNĐ) <span className="text-red-500">*</span></span>
                                                 <input
@@ -236,7 +214,6 @@ export default function CreatePromotion() {
                                                 />
                                             </label>
 
-                                            {/* Giới hạn số lượt dùng */}
                                             <label className="flex flex-col w-full gap-2">
                                                 <span className="label-text">Giới hạn số lượt dùng (Để trống = Vô hạn)</span>
                                                 <input
@@ -252,7 +229,6 @@ export default function CreatePromotion() {
                                         </div>
                                     </div>
 
-                                    {/* --- NHÓM 3: THỜI GIAN --- */}
                                     <div className="pt-6 border-t border-stone-100 dark:border-stone-700">
                                         <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
                                             Thời gian & Trạng thái
@@ -297,7 +273,6 @@ export default function CreatePromotion() {
                                         </div>
                                     </div>
 
-                                    {/* --- ACTIONS --- */}
                                     <div className="flex justify-end gap-4 pt-4 border-t border-stone-100 dark:border-stone-700">
                                         <button type="button" onClick={() => navigate(-1)} className="h-11 px-6 rounded-xl border border-stone-200 text-stone-600 font-medium hover:bg-stone-50 transition-colors">
                                             Hủy bỏ

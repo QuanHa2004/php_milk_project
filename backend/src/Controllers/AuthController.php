@@ -14,7 +14,6 @@ class AuthController
      /* ============================================
          1. TẠO TOKEN (dùng cho login + social login)
      ============================================ */
-     // Generate a short-lived JWT access token for a user
      public function generateToken($userId, $roleId, $email = null)
     {
         $payload = [
@@ -32,7 +31,6 @@ class AuthController
      /* ============================================
          2. AUTH TRUYỀN THỐNG (REGISTER + LOGIN)
      ============================================ */
-     // Register a new user or link a Google account to an existing user
      public function register($data)
     {
         $db = Connection::get();
@@ -106,7 +104,6 @@ class AuthController
         }
     }
 
-    // Authenticate user and return access/refresh tokens
     public function login($data)
     {
         $db = Connection::get();
@@ -157,7 +154,6 @@ class AuthController
     → Hỗ trợ lấy Authorization header trên mọi server
     ============================================
     */
-    // Extract bearer token from request headers in a portable way
     private function getBearerToken() 
     {
         $headers = null;
@@ -196,7 +192,6 @@ class AuthController
     → Kiểm tra token hợp lệ, hết hạn, decode payload
     ============================================
     */
-    // Decode and validate the JWT access token
     public function decodeToken()
     {
         $token = $this->getBearerToken();
@@ -220,7 +215,6 @@ class AuthController
     4. LẤY THÔNG TIN USER (CURRENT + PROFILE)
     ============================================
     */
-    // Return current user info decoded from token
     public function currentUser()
     {
         $payload = $this->decodeToken();
@@ -246,7 +240,6 @@ class AuthController
         return $user;
     }
 
-    // API endpoint: return authenticated user's profile
     public function profile()
     {
         try {

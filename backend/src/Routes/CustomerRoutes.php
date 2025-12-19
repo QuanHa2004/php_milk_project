@@ -1,27 +1,18 @@
 <?php
-/* ============================
-   USER ROUTES
-============================ */
 
+/* USER */
 if ($uri === "/users/update" && $method === "POST") {
     $user->updateUser(json_decode(file_get_contents('php://input'), true));
     exit;
 }
 
-/* ============================
-   CATEGORY ROUTES
-============================ */
-
+/* CATEGORY */
 if ($uri === "/categories" && $method === "GET") {
-    $category->index();
+    $category->getCategoryList();
     exit;
 }
 
-
-/* ============================
-   PRODUCT ROUTES
-============================ */
-
+/* PRODUCT */
 if ($uri === "/products" && $method === "GET") {
     $product->index();
     exit;
@@ -42,16 +33,7 @@ if (preg_match("#^/products/search/(.*)$#", $uri, $matches) && $method === "GET"
     exit;
 }
 
-if ($uri === "/products/calc" && $method === "POST") {
-    $product->calculateVariant(json_decode(file_get_contents("php://input"), true));
-    exit;
-}
-
-
-/* ============================
-   CART ROUTES
-============================ */
-
+/* CART */
 if ($uri === "/carts/add" && $method === "POST") {
     $cart->add(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -66,6 +48,7 @@ if ($uri === "/carts/update" && $method === "PUT") {
     $cart->update(json_decode(file_get_contents('php://input'), true));
     exit;
 }
+
 if (preg_match('#^/carts/(\d+)/status$#', $uri, $matches) && $method === "PUT") {
     $cart->updateItemStatus((int)$matches[1], json_decode(file_get_contents('php://input'), true));
     exit;
@@ -76,11 +59,7 @@ if ($uri === "/carts/current_user" && $method === "GET") {
     exit;
 }
 
-
-/* ============================
-   ORDER ROUTES
-============================ */
-
+/* ORDER */
 if ($uri === "/orders/checkout" && $method === "POST") {
     $order->checkout(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -96,11 +75,7 @@ if ($uri === "/orders/history" && $method === "GET") {
     exit;
 }
 
-
-/* ============================
-   PAYMENT ROUTES
-============================ */
-
+/* PAYMENT */
 if ($uri === "/checkout/process-vnpay" && $method === "POST") {
     $payment->createPaymentUrl(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -111,11 +86,7 @@ if ($uri === "/payment/vnpay_return" && $method === "GET") {
     exit;
 }
 
-
-/* ============================
-   SOCIAL AUTH ROUTES
-============================ */
-
+/* SOCIAL AUTH */
 if ($uri === "/auth/google" && $method === "GET") {
     $socialAuth->redirectToGoogle();
     exit;
@@ -126,14 +97,13 @@ if ($uri === "/auth/google/callback" && $method === "GET") {
     exit;
 }
 
+/* REVIEW */
 if ($uri === "/reviews/add" && $method === "POST") {
     $review->addReview(json_decode(file_get_contents('php://input'), true));
     exit;
 }
 
 if (preg_match('#^/reviews/(\d+)/(\d+)$#', $uri, $matches) && $method === "GET") {
-    $product_id = (int)$matches[1];
-    $variant_id = (int)$matches[2];
-    $review->getProductReviews($product_id, $variant_id);
+    $review->getProductReviews((int)$matches[1], (int)$matches[2]);
     exit;
 }

@@ -24,4 +24,20 @@ class OrderController
             ], 500);
         }
     }
+
+    public function getMonthlyRevenue()
+    {
+        try {
+            $data = Order::totalRevenueAndOrders();
+            Response::json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            Response::json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
