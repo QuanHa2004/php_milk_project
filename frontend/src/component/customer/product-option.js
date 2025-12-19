@@ -40,18 +40,25 @@ export default function ProductOption() {
   useEffect(() => {
     if (searchResult) {
       setProducts(searchResult);
-    } else {
-      const url = category_id
-        ? `http://localhost:8000/${category_id}/products`
-        : `http://localhost:8000/products`;
-
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => setProducts(data))
-        .catch((err) => console.error("Không có sản phẩm", err));
+      return;
     }
+
+    const url = category_id
+      ? `http://localhost:8000/${category_id}/products`
+      : `http://localhost:8000/products`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(Array.isArray(data.data) ? data.data : []);
+      })
+      .catch(err => {
+        console.error("Không có sản phẩm", err);
+        setProducts([]);
+      });
   }, [category_id, searchResult]);
 
+  console.log(products);
   // Điều hướng sang trang chi tiết sản phẩm
   const handleClick = (product) => {
     navigate(`/product-details/${product.product_id}`);
@@ -93,7 +100,7 @@ export default function ProductOption() {
         {products.length > 0 ? (
           <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products
-              .filter(product => product.quantity > 0)
+              .filter(product => product.total_quantity > 0)
               .map((product) => (
                 <li key={product.product_id}>
                   <div
@@ -111,18 +118,15 @@ export default function ProductOption() {
                           {product.product_name}
                         </p>
 
-                        <p className="text-base font-medium text-gray-700 dark:text-gray-300">
-                          {Number(product.price).toLocaleString("vi-VN")} VND
-                        </p>
-
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Số lượng còn: {product.quantity}
+                          Số lượng còn: {product.total_quantity}
                         </p>
                       </div>
                     </div>
                   </div>
                 </li>
               ))}
+
           </ul>
         ) : (
           <p className="text-center text-white">Chưa có sản phẩm</p>

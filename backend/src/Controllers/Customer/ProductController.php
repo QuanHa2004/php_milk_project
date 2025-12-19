@@ -14,8 +14,13 @@ class ProductController
     // Trả về toàn bộ danh sách sản phẩm
     public function index()
     {
-        return Response::json(Product::all_1());
+        $products = Product::all_1();
+
+        Response::json([
+            'data' => $products
+        ]);
     }
+    
 
     /* ============================
        2. LẤY SẢN PHẨM THEO DANH MỤC
@@ -24,8 +29,12 @@ class ProductController
     public function getByCategory($category_id)
     {
         $products = Product::getByCategory($category_id);
-        Response::json($products);
+
+        Response::json([
+            'data' => $products
+        ]);
     }
+
 
     /* ============================
        3. LẤY CHI TIẾT SẢN PHẨM
@@ -54,7 +63,9 @@ class ProductController
             Response::json(['error' => 'Không tìm thấy sản phẩm'], 404);
         }
 
-        Response::json($products);
+        Response::json([
+            'data'=> $products
+        ]);
     }
 
     /* ============================

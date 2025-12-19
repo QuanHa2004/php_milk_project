@@ -36,10 +36,15 @@ export default function Header() {
     fetch(`http://localhost:8000/products/search/${searchName}`)
       .then((res) => res.json())
       .then((data) => {
-        navigate("/products", { state: { result: data } });
+        navigate("/products", {
+          state: {
+            result: Array.isArray(data.data) ? data.data : []
+          }
+        });
       })
       .catch((err) => console.error("Không tìm thấy", err));
   };
+
 
   // Xử lý đăng xuất
   const handleLogOut = () => {

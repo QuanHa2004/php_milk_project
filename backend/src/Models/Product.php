@@ -16,26 +16,34 @@ class Product
     {
         $db = Connection::get();
 
-        $sql = "SELECT 
-                p.product_id,
-                p.product_name,
-                p.category_id,
-                c.category_name,
-                p.image_url,
-                p.description,
-                p.created_at,
-                p.is_hot,
-                MIN(v.price) as price,
-                SUM(v.stock_quantity) as quantity
-            FROM product p
-            LEFT JOIN category c ON p.category_id = c.category_id
-            LEFT JOIN product_variant v ON p.product_id = v.product_id
-            WHERE p.is_deleted = 0
-            GROUP BY p.product_id
-            ORDER BY p.product_id DESC";
+        $sql = "
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.category_id,
+            c.category_name,
+            p.image_url,
+            p.description,
+            p.created_at,
+            p.is_hot,
+
+            COALESCE(MIN(v.price), 0) AS min_price,
+            COALESCE(SUM(v.stock_quantity), 0) AS total_quantity
+
+        FROM product p
+        LEFT JOIN category c 
+               ON p.category_id = c.category_id
+        LEFT JOIN product_variant v 
+               ON p.product_id = v.product_id
+               AND v.is_active = 1
+        WHERE p.is_deleted = 0
+        GROUP BY p.product_id
+        ORDER BY p.product_id DESC
+    ";
 
         return $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     public static function all()
     {
@@ -139,29 +147,33 @@ class Product
         $db = Connection::get();
 
         $sql = "
-            SELECT 
-                p.product_id,
-                p.product_name,
-                p.category_id,
-                c.category_name,
-                p.price,
-                p.quantity,
-                p.discount_percent,
-                p.image_url,
-                p.description,
-                p.created_at,
-                p.is_hot
-            FROM product p
-            LEFT JOIN category c ON p.category_id = c.category_id
-            WHERE p.category_id = :category_id AND p.is_deleted = 0
-            ORDER BY p.product_id DESC
-        ";
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.category_id,
+            c.category_name,
+            p.image_url,
+            p.description,
+            p.created_at,
+            p.is_hot,
+            COALESCE(SUM(pv.stock_quantity), 0) AS total_quantity
+        FROM product p
+        LEFT JOIN category c ON p.category_id = c.category_id
+        LEFT JOIN product_variant pv 
+               ON p.product_id = pv.product_id
+               AND pv.is_active = 1
+        WHERE p.category_id = :category_id
+          AND p.is_deleted = 0
+        GROUP BY p.product_id
+        ORDER BY p.product_id DESC
+    ";
 
         $stmt = $db->prepare($sql);
         $stmt->execute(['category_id' => $category_id]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
     /* ============================
@@ -288,14 +300,33 @@ class Product
     {
         $db = Connection::get();
         $search_name = trim($search_name);
-        $sql = "SELECT product_id, product_name, category_id, price, quantity, discount_percent, image_url, description 
-            FROM product 
-            WHERE product_name LIKE :search_name 
-            AND is_deleted = 0";
+
+        $sql = "
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.category_id,
+            p.image_url,
+            p.description,
+            p.is_hot,
+            MIN(v.price) AS min_price,
+            SUM(v.stock_quantity) AS total_quantity
+        FROM product p
+        LEFT JOIN product_variant v ON p.product_id = v.product_id
+        WHERE p.product_name LIKE :search_name
+          AND p.is_deleted = 0
+        GROUP BY p.product_id
+        ORDER BY p.product_id DESC
+    ";
+
         $stmt = $db->prepare($sql);
-        $stmt->execute(['search_name' => "%$search_name%"]);
+        $stmt->execute([
+            'search_name' => "%$search_name%"
+        ]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
     /* ============================
