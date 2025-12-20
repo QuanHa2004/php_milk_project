@@ -28,7 +28,7 @@ class Order
                     shipping_fee, total_amount,
                     payment_method, note, is_paid
                 ) VALUES (
-                    :user_id, 'pending',
+                    :user_id, 'delivered',
                     :full_name, :phone, :delivery_address,
                     :delivery_date, NOW(),
                     :shipping_fee, :total_amount,
@@ -182,7 +182,8 @@ class Order
                 SUM(total_amount) AS total_revenue
             FROM orders
             WHERE 
-                MONTH(order_date) = MONTH(CURRENT_DATE())
+                status = 'delivered'
+                AND MONTH(order_date) = MONTH(CURRENT_DATE())
                 AND YEAR(order_date) = YEAR(CURRENT_DATE())
         ";
 

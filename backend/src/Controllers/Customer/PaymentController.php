@@ -128,7 +128,7 @@ class PaymentController
             if ($vnp_ResponseCode == '00') {
 
                 // A. Cập nhật trạng thái đơn hàng
-                Order::updateStatus($order_id, 'processing', true);
+                Order::updateStatus($order_id, 'delivered', true);
 
                 // B. Xóa sản phẩm khỏi giỏ hàng
                 $order = Order::find($order_id);

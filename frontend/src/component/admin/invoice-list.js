@@ -41,9 +41,6 @@ export default function InvoiceList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[15%]">
                                 Ngày nhập
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%] text-right">
-                                Hành động
-                            </th>
                         </tr>
                     </thead>
 
@@ -62,7 +59,7 @@ export default function InvoiceList() {
                         {/* Empty */}
                         {!isLoading && rows.length === 0 && (
                             <tr>
-                                <td colSpan="5" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="4" className="px-6 py-12 text-center text-stone-400">
                                     Chưa có phiếu nhập hàng nào.
                                 </td>
                             </tr>
@@ -85,25 +82,18 @@ export default function InvoiceList() {
                                     {/* Supplier */}
                                     <td className="px-6 py-4">
                                         <span className="font-semibold text-stone-700 dark:text-stone-200">
-                                            Nhà cung cấp #{invoice.supplier_id}
+                                            {invoice.supplier_name}
                                         </span>
                                     </td>
 
                                     {/* Total */}
                                     <td className="px-6 py-4 text-sm font-bold text-stone-800 dark:text-stone-100">
-                                        {Number(invoice.total_amount).toLocaleString("vi-VN")} ₫
+                                        {Number(invoice.total_amount).toLocaleString("vi-VN")} 
                                     </td>
 
                                     {/* Date */}
                                     <td className="px-6 py-4 text-sm text-stone-500 dark:text-stone-400">
                                         {new Date(invoice.created_at).toLocaleDateString("vi-VN")}
-                                    </td>
-
-                                    {/* Action */}
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-sm font-medium text-amber-700 hover:text-amber-900 hover:underline">
-                                            Xem chi tiết
-                                        </button>
                                     </td>
                                 </tr>
                             ))}

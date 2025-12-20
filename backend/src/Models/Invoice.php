@@ -11,9 +11,24 @@ class Invoice
     public static function all()
     {
         $db = Connection::get();
-        $stmt = $db->query("SELECT * FROM invoice");
+
+        $sql = "
+            SELECT 
+                i.invoice_id,
+                i.supplier_id,
+                s.supplier_name,
+                i.total_amount,
+                i.created_at
+            FROM invoice i
+            LEFT JOIN supplier s 
+                ON i.supplier_id = s.supplier_id
+            ORDER BY i.created_at DESC
+        ";
+
+        $stmt = $db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     public static function createInvoice($data)
     {

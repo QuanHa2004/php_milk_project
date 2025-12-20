@@ -4,7 +4,7 @@ const statusMap = {
     pending: { label: "Chờ xử lý", cls: "bg-stone-100 text-stone-700 border-stone-200" },
     processing: { label: "Đang xử lý", cls: "bg-amber-100 text-amber-800 border-amber-200" },
     shipping: { label: "Đang giao", cls: "bg-blue-100 text-blue-800 border-blue-200" },
-    delivered: { label: "Hoàn thành", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+    delivered: { label: "Đã thanh toán", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
     cancelled: { label: "Đã hủy", cls: "bg-red-100 text-red-700 border-red-200" }
 };
 
@@ -39,7 +39,6 @@ export default function OrderList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[16%]">Ngày đặt</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[14%]">Tổng tiền</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[18%]">Trạng thái</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%] text-right">Hành động</th>
                         </tr>
                     </thead>
 
@@ -86,18 +85,12 @@ export default function OrderList() {
                                                 {status.label}
                                             </span>
                                         </td>
-
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="text-sm font-medium text-amber-700 hover:text-amber-900 hover:underline">
-                                                Chi tiết
-                                            </button>
-                                        </td>
                                     </tr>
                                 );
                             })
                         ) : (
                             <tr>
-                                <td colSpan="6" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="5" className="px-6 py-12 text-center text-stone-400">
                                     Chưa có đơn hàng nào
                                 </td>
                             </tr>

@@ -54,6 +54,7 @@ class Product
                 c.category_name,
                 p.image_url,
                 p.description,
+                p.is_deleted,
                 p.is_hot,
 
             (
@@ -113,7 +114,6 @@ class Product
 
             FROM product p
             LEFT JOIN category c ON p.category_id = c.category_id
-            WHERE p.is_deleted = 0
             ORDER BY p.product_id DESC
         ";
 

@@ -107,3 +107,8 @@ if (preg_match('#^/reviews/(\d+)/(\d+)$#', $uri, $matches) && $method === "GET")
     $review->getProductReviews((int)$matches[1], (int)$matches[2]);
     exit;
 }
+
+if ($uri === "/promotions" && $method === "GET") {
+    $promotion->getPromotionList();
+    exit;
+}

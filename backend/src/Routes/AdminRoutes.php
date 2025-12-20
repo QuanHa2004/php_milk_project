@@ -61,6 +61,15 @@ if ($uri === "/admin/invoices" && $method === "GET") {
     exit;
 }
 
+if ($uri === "/admin/promotions/status" && $method === "PUT") {
+    $promotionAdmin->updateStatus(json_decode(file_get_contents("php://input"), true));
+    exit;
+}
+
+if ($uri === "/admin/users/status" && $method === "PUT") {
+    $userAdmin->updateStatus(json_decode(file_get_contents("php://input"), true));
+    exit;
+}
 
 
 

@@ -26,10 +26,9 @@ export default function ManufacturerList() {
                 <table className="w-full table-fixed text-left">
                     <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[22%]">Nhà cung cấp</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[28%]">Liên hệ</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[30%]">Địa chỉ</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[20%] text-right">Hành động</th>
+                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[30%]">Nhà cung cấp</th>
+                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[30%]">Liên hệ</th>
+                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[40%]">Địa chỉ</th>
                         </tr>
                     </thead>
 
@@ -76,17 +75,11 @@ export default function ManufacturerList() {
                                             {item.address || "--"}
                                         </p>
                                     </td>
-
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-sm font-medium text-amber-700 hover:text-amber-900 hover:underline">
-                                            Xem chi tiết
-                                        </button>
-                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="3" className="px-6 py-12 text-center text-stone-400">
                                     Chưa có nhà sản xuất nào
                                 </td>
                             </tr>

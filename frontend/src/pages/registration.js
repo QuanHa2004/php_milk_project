@@ -27,6 +27,25 @@ export default function Registration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const nameRegex = /^[^\d]+$/;
+    const phoneRegex = /^0\d{10}$/;
+    const passwordRegex = /^.{6,}$/;
+
+    if (!nameRegex.test(formData.full_name.trim())) {
+      setMessage("Tên không được chứa số");
+      return;
+    }
+
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      setMessage("Số điện thoại phải gồm 11 chữ số và bắt đầu bằng số 0");
+      return;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      setMessage("Mật khẩu phải nhiều hơn 5 ký tự");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setMessage("Mật khẩu xác nhận không giống!");
       return;
@@ -37,18 +56,18 @@ export default function Registration() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          full_name: formData.full_name,
-          email: formData.email,
+          full_name: formData.full_name.trim(),
+          email: formData.email.trim(),
           phone: formData.phone,
           address: formData.address,
           password: formData.password,
-          role_id: 2
+          role_id: 2,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.detail || "Đăng ký thất bại");
+        throw new Error(data.message || "Đăng ký thất bại");
       }
 
       setMessage(data.message);
@@ -66,6 +85,7 @@ export default function Registration() {
       setMessage(err.message);
     }
   };
+
 
   return (
     <div className="font-display">

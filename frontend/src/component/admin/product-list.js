@@ -38,7 +38,7 @@ export default function ProductList() {
         )
     );
 
-    console.log(rows);
+    console.log(flatRows);
 
     return (
         <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
@@ -53,7 +53,6 @@ export default function ProductList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[12%]">Trạng thái</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[8%]">Hot</th>
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[14%]">HSD</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%] text-right">Hành động</th>
                         </tr>
                     </thead>
 
@@ -106,17 +105,11 @@ export default function ProductList() {
                                     <td className="px-6 py-4 text-sm text-stone-600">
                                         {row.expiration_date || "--"}
                                     </td>
-
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-sm font-medium text-amber-700 hover:underline">
-                                            Chi tiết
-                                        </button>
-                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="8" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="7" className="px-6 py-12 text-center text-stone-400">
                                     Chưa có sản phẩm
                                 </td>
                             </tr>

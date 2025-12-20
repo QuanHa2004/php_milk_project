@@ -7,6 +7,31 @@ use PDO;
 
 class User
 {
+    public static function updateStatus($userId, $status)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("
+            UPDATE user 
+            SET is_deleted = :is_deleted 
+            WHERE user_id = :user_id
+        ");
+
+        $stmt->execute([
+            ':is_deleted' => $status,
+            ':user_id' => $userId
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+
+    public static function findById($userId)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("SELECT * FROM user WHERE user_id = :id");
+        $stmt->execute([':id' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     public static function findByEmail($email)
     {
@@ -127,7 +152,7 @@ class User
                 AND MONTH(created_at) = MONTH(CURRENT_DATE())
                 AND YEAR(created_at) = YEAR(CURRENT_DATE())
             ORDER BY created_at DESC
-        ";  
+        ";
 
         $stmt = $db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -40,9 +40,6 @@ export default function CategoryList() {
                             <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase tracking-wider w-1/2">
                                 Tên danh mục
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase tracking-wider w-1/4 text-right">
-                                Hành động
-                            </th>
                         </tr>
                     </thead>
 
@@ -66,17 +63,11 @@ export default function CategoryList() {
                                             </span>
                                         </div>
                                     </td>
-
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-sm font-medium text-amber-700 hover:text-amber-900 hover:underline transition-colors">
-                                            Xem chi tiết
-                                        </button>
-                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="3" className="px-6 py-12 text-center">
+                                <td colSpan="2" className="px-6 py-12 text-center">
                                     <div className="flex flex-col items-center justify-center text-stone-400">
                                         <p className="text-sm font-medium">Chưa có danh mục nào.</p>
                                         <p className="text-xs mt-1 text-stone-400">Hãy thêm danh mục mới để bắt đầu bán hàng.</p>
