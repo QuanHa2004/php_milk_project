@@ -34,55 +34,63 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#FDFBF7] dark:bg-[#1C1917]">
-      <div className="fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0">
+    <div className="flex min-h-screen bg-[#f8f9fa] font-sans">
+      <div className="fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 translate-x-0">
         <SideBar />
       </div>
 
-      <main className="flex-1 p-8 w-full overflow-hidden">
-        <div className="flex flex-col gap-8 max-w-7xl mx-auto">
-          <div className="flex min-w-72 flex-col gap-1">
-            <p className="text-stone-800 dark:text-stone-100 text-3xl font-black tracking-tight">
-              Bảng điều khiển
-            </p>
-            <p className="text-stone-500 dark:text-stone-400 text-sm">
-              Tổng quan tình hình kinh doanh tháng này.
-            </p>
+      <main className="flex-1 ml-64 p-8">
+        <div className="w-full max-w-7xl mx-auto">
+          
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-[#1a3c7e] tracking-tight uppercase">Tổng quan</h1>
+            <p className="text-gray-500 text-sm mt-1">Báo cáo hoạt động kinh doanh hôm nay.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="group relative flex flex-col gap-4 rounded-2xl p-6 bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-amber-900/10 hover:-translate-y-1 transition-all duration-300">
-              <div>
-                <p className="text-stone-500 dark:text-stone-400 text-sm font-medium mb-1">
-                  Tổng doanh thu
-                </p>
-                <h3 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-                  {Number(report.total_revenue).toLocaleString('vi-VN')}
-                </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Card 1: Doanh thu */}
+            <div className="group relative flex flex-col justify-between rounded-2xl p-6 bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.04)] hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">
+                    Tổng doanh thu
+                  </p>
+                  <h3 className="text-3xl font-bold text-[#1a3c7e]">
+                    {Number(report.total_revenue).toLocaleString('vi-VN')}
+                  </h3>
+                </div>
               </div>
             </div>
 
-            <div className="group relative flex flex-col gap-4 rounded-2xl p-6 bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-amber-900/10 hover:-translate-y-1 transition-all duration-300">
-              <div>
-                <p className="text-stone-500 dark:text-stone-400 text-sm font-medium mb-1">
-                  Tổng đơn hàng
-                </p>
-                <h3 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-                  {Number(report.total_orders).toLocaleString('vi-VN')}
-                </h3>
+            {/* Card 2: Đơn hàng */}
+            <div className="group relative flex flex-col justify-between rounded-2xl p-6 bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.04)] hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">
+                    Tổng đơn hàng
+                  </p>
+                  <h3 className="text-3xl font-bold text-[#1a3c7e]">
+                    {Number(report.total_orders).toLocaleString('vi-VN')}
+                  </h3>
+                </div>
               </div>
             </div>
 
-            <div className="group relative flex flex-col gap-4 rounded-2xl p-6 bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 shadow-sm hover:shadow-amber-900/10 hover:-translate-y-1 transition-all duration-300">
-              <div>
-                <p className="text-stone-500 dark:text-stone-400 text-sm font-medium mb-1">
-                  Khách hàng mới
-                </p>
-                <h3 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-                  {Number(report.new_customer).toLocaleString('vi-VN')}
-                </h3>
+            {/* Card 3: Khách hàng */}
+            <div className="group relative flex flex-col justify-between rounded-2xl p-6 bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.04)] hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-1">
+                    Khách hàng mới
+                  </p>
+                  <h3 className="text-3xl font-bold text-[#1a3c7e]">
+                    {Number(report.new_customer).toLocaleString('vi-VN')}
+                  </h3>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </main>

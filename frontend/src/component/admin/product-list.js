@@ -38,57 +38,55 @@ export default function ProductList() {
         )
     );
 
-    console.log(flatRows);
-
     return (
-        <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full table-fixed text-left">
-                    <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
+                    <thead className="bg-[#f8f9fa] border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[22%]">Sản phẩm</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[22%]">Biến thể</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[12%]">Giá</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%]">Số lượng</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[12%]">Trạng thái</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[8%]">Hot</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[14%]">HSD</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[22%]">Sản phẩm</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[22%]">Biến thể</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[12%]">Giá</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[10%]">Số lượng</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[12%]">Trạng thái</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[8%]">Hot</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[14%]">HSD</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+                    <tbody className="divide-y divide-gray-100">
                         {isLoading ? (
                             <tr>
-                                <td colSpan="8" className="px-6 py-10 text-center text-stone-500">
+                                <td colSpan="8" className="px-6 py-10 text-center text-gray-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
                         ) : flatRows.length > 0 ? (
                             flatRows.map((row, idx) => (
-                                <tr key={idx} className="hover:bg-[#FAF9F6] dark:hover:bg-stone-800/30">
-                                    <td className="px-6 py-4 font-semibold text-stone-700 dark:text-stone-200">
+                                <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
+                                    <td className="px-6 py-4 font-semibold text-[#333]">
                                         {row.product_name}
                                     </td>
 
-                                    <td className="px-6 py-4 text-stone-700 dark:text-stone-200">
+                                    <td className="px-6 py-4 text-gray-600">
                                         {row.variant_name}
                                     </td>
 
-                                    <td className="px-6 py-4 font-bold text-stone-800 dark:text-stone-100">
-                                        {Number(row.price).toLocaleString("vi-VN")} 
+                                    <td className="px-6 py-4 font-bold text-[#d32f2f]">
+                                        {Number(row.price).toLocaleString("vi-VN")}
                                     </td>
 
-                                    <td className={`px-6 py-4 font-medium ${row.quantity > 0 ? "text-stone-600" : "text-red-500"}`}>
+                                    <td className={`px-6 py-4 font-bold ${row.quantity > 0 ? "text-gray-700" : "text-red-500"}`}>
                                         {row.quantity}
                                     </td>
 
                                     <td className="px-6 py-4">
                                         {row.is_deleted ? (
-                                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-stone-100 text-stone-500 border border-stone-200">
+                                            <span className="px-3 py-1 text-xs font-bold rounded-full bg-gray-100 text-gray-500 border border-gray-200">
                                                 Đã ẩn
                                             </span>
                                         ) : (
-                                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <span className="px-3 py-1 text-xs font-bold rounded-full bg-green-50 text-green-700 border border-green-100">
                                                 Hiển thị
                                             </span>
                                         )}
@@ -96,20 +94,20 @@ export default function ProductList() {
 
                                     <td className="px-6 py-4">
                                         {row.is_hot && (
-                                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-700 border border-orange-200">
+                                            <span className="px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-600 border border-red-100">
                                                 HOT
                                             </span>
                                         )}
                                     </td>
 
-                                    <td className="px-6 py-4 text-sm text-stone-600">
+                                    <td className="px-6 py-4 text-sm text-gray-500 font-medium">
                                         {row.expiration_date || "--"}
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="7" className="px-6 py-12 text-center text-gray-400">
                                     Chưa có sản phẩm
                                 </td>
                             </tr>

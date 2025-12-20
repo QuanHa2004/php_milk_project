@@ -1,6 +1,6 @@
 import SideBar from "../../component/admin/side-bar";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback  } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -38,10 +38,10 @@ export default function AddProduct() {
   const [minerals, setMinerals] = useState([{ name: "", value: "" }]);
 
   const inputClass =
-    "w-full h-11 px-4 rounded-xl border border-stone-200 dark:border-stone-600 bg-white dark:bg-[#1C1917] text-stone-800 dark:text-white placeholder:text-stone-400 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all duration-200 text-sm";
+    "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-[#333] placeholder-gray-400 focus:outline-none focus:border-[#1a3c7e] focus:ring-1 focus:ring-[#1a3c7e] transition-all duration-200 text-sm";
 
   const labelClass =
-    "text-stone-700 dark:text-stone-300 text-sm font-semibold mb-1.5 block";
+    "text-[#1a3c7e] text-sm font-bold mb-1.5 block uppercase tracking-wide";
 
   const fetchList = useCallback((url, setter) => {
     fetch(url)
@@ -115,7 +115,7 @@ export default function AddProduct() {
   };
 
   return (
-    <div className="relative flex min-h-screen bg-[#FDFBF7] dark:bg-[#1C1917]">
+    <div className="relative flex min-h-screen bg-[#f8f9fa] font-sans">
       <div className="ml-64 w-full">
         <div className="fixed inset-y-0 left-0 z-50 w-64">
           <SideBar />
@@ -123,15 +123,15 @@ export default function AddProduct() {
 
         <main className="p-8 w-full max-w-6xl mx-auto">
           <div className="flex flex-col gap-1 mb-8">
-            <p className="text-stone-800 dark:text-stone-100 text-3xl font-black tracking-tight">Thêm sản phẩm mới</p>
-            <p className="text-stone-500 dark:text-stone-400 text-sm">Nhập thông tin chi tiết đầy đủ cho sản phẩm sữa.</p>
+            <p className="text-[#1a3c7e] text-3xl font-black tracking-tight uppercase">Thêm sản phẩm mới</p>
+            <p className="text-gray-500 text-sm">Nhập thông tin chi tiết đầy đủ cho sản phẩm sữa.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            <div className="bg-white dark:bg-[#292524] rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
-              <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#1a3c7e] mb-6 flex items-center gap-2 uppercase tracking-wide">
+                <span className="p-2 rounded-lg bg-blue-50 text-[#1a3c7e]">
                   <span className="material-symbols-outlined text-lg">inventory_2</span>
                 </span>
                 Thông tin cơ bản
@@ -185,14 +185,14 @@ export default function AddProduct() {
 
                 <label className="lg:col-span-3">
                   <span className={labelClass}>Mô tả ngắn</span>
-                  <textarea name="description" value={productData.description} onChange={handleChange(setProductData)} className={`${inputClass} h-24 py-2`} />
+                  <textarea name="description" value={productData.description} onChange={handleChange(setProductData)} className={`${inputClass} h-24 py-2 resize-none`} />
                 </label>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#292524] rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-6">
-              <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-6 flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#1a3c7e] mb-6 flex items-center gap-2 uppercase tracking-wide">
+                <span className="p-2 rounded-lg bg-blue-50 text-[#1a3c7e]">
                   <span className="material-symbols-outlined text-lg">article</span>
                 </span>
                 Chi tiết & Hướng dẫn
@@ -214,8 +214,8 @@ export default function AddProduct() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-[#292524] rounded-2xl border p-6">
-                <h3 className="text-lg font-bold mb-6">Dinh dưỡng chính</h3>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 className="text-lg font-bold text-[#1a3c7e] mb-6 uppercase tracking-wide">Dinh dưỡng chính</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {Object.keys(macros).map(k => (
                     <label key={k}>
@@ -226,21 +226,21 @@ export default function AddProduct() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#292524] rounded-2xl border p-6">
-                <h3 className="text-lg font-bold mb-6">Vitamin & Khoáng chất</h3>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 className="text-lg font-bold text-[#1a3c7e] mb-6 uppercase tracking-wide">Vitamin & Khoáng chất</h3>
 
                 {[{ title: "Vitamin", list: vitamins, set: setVitamins }, { title: "Khoáng chất", list: minerals, set: setMinerals }].map((g, i) => (
                   <div key={i} className="mb-4">
                     <div className="flex justify-between mb-2">
-                      <span className="text-xs font-bold">{g.title}</span>
-                      <button type="button" onClick={() => addRow(g.set)} className="text-xs text-blue-600">+ Thêm</button>
+                      <span className="text-sm font-bold text-[#1a3c7e]">{g.title}</span>
+                      <button type="button" onClick={() => addRow(g.set)} className="text-xs font-bold text-blue-600 hover:underline">+ Thêm dòng</button>
                     </div>
                     {g.list.map((item, idx) => (
                       <div key={idx} className="flex gap-2 mb-2">
-                        <input value={item.name} onChange={e => handleDynamicChange(idx, g.list, g.set, "name", e.target.value)} className={`${inputClass} !h-9 !text-xs`} />
-                        <input value={item.value} onChange={e => handleDynamicChange(idx, g.list, g.set, "value", e.target.value)} className={`${inputClass} !h-9 !text-xs`} />
+                        <input value={item.name} onChange={e => handleDynamicChange(idx, g.list, g.set, "name", e.target.value)} className={`${inputClass} !h-9 !text-xs`} placeholder="Tên chất" />
+                        <input value={item.value} onChange={e => handleDynamicChange(idx, g.list, g.set, "value", e.target.value)} className={`${inputClass} !h-9 !text-xs`} placeholder="Hàm lượng" />
                         {g.list.length > 1 && (
-                          <button type="button" onClick={() => removeRow(idx, g.list, g.set)} className="text-red-500 font-bold">✕</button>
+                          <button type="button" onClick={() => removeRow(idx, g.list, g.set)} className="text-red-500 hover:text-red-700 font-bold px-2">✕</button>
                         )}
                       </div>
                     ))}
@@ -249,9 +249,9 @@ export default function AddProduct() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 pt-6 border-t">
-              <button type="button" onClick={() => navigate(-1)} className="h-11 px-6 rounded-xl border">Hủy bỏ</button>
-              <button type="submit" disabled={isSubmitting} className="h-11 px-8 rounded-xl bg-amber-900 text-white">
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
+              <button type="button" onClick={() => navigate(-1)} className="h-11 px-6 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Hủy bỏ</button>
+              <button type="submit" disabled={isSubmitting} className="h-11 px-8 rounded-xl bg-[#1a3c7e] text-white font-bold shadow-lg shadow-blue-100 hover:bg-[#15326d] transition-all">
                 {isSubmitting ? "Đang lưu..." : "Xác nhận thêm"}
               </button>
             </div>

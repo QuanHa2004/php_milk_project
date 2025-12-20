@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 
-export default function UserList() {
+export default function ReviewList() {
     const [rows, setRows] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch("http://localhost:8000/admin/users");
+                const res = await fetch("http://localhost:8000/admin/reviews");
+                if (!res.ok) throw new Error("Server error");
                 const json = await res.json();
                 setRows(Array.isArray(json.data) ? json.data : []);
             } catch {
@@ -21,62 +20,25 @@ export default function UserList() {
         fetchData();
     }, []);
 
-    const openConfirm = (user) => {
-        setSelectedUser(user);
-        setConfirmOpen(true);
-    };
-
-    const confirmToggle = async () => {
-        if (!selectedUser) return;
-
-        const newStatus = selectedUser.is_deleted === 0 ? 1 : 0;
-
-        try {
-            const res = await fetch("http://localhost:8000/admin/users/status", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user_id: selectedUser.user_id,
-                    is_deleted: newStatus
-                })
-            });
-
-            const json = await res.json();
-            if (!res.ok || !json.success) throw new Error();
-
-            setRows(prev =>
-                prev.map(u =>
-                    u.user_id === selectedUser.user_id
-                        ? { ...u, is_deleted: newStatus }
-                        : u
-                )
-            );
-        } catch {
-            alert("Không thể cập nhật trạng thái người dùng");
-        } finally {
-            setConfirmOpen(false);
-            setSelectedUser(null);
-        }
-    };
-
     return (
-        <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm font-sans">
             <div className="overflow-x-auto">
                 <table className="w-full table-fixed text-left">
-                    <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
+                    <thead className="bg-[#f4f7fc] border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[25%]">Họ và tên</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[20%]">Email</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[15%]">SĐT</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[20%]">Địa chỉ</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[10%]">Trạng thái</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[20%]">Người dùng</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[20%]">Sản phẩm</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[15%]">Biến thể</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[15%]">Đánh giá</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[20%]">Bình luận</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[10%] text-right">Hành động</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+                    <tbody className="divide-y divide-gray-100">
                         {isLoading && (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-stone-500">
+                                <td colSpan={6} className="px-6 py-6 text-center text-gray-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
@@ -84,74 +46,65 @@ export default function UserList() {
 
                         {!isLoading && rows.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-stone-500">
-                                    Không có người dùng nào
+                                <td colSpan={6} className="px-6 py-6 text-center text-gray-500">
+                                    Không có đánh giá nào
                                 </td>
                             </tr>
                         )}
 
                         {!isLoading &&
-                            rows.map((user) => (
-                                <tr
-                                    key={user.user_id}
-                                    className="hover:bg-stone-50 dark:hover:bg-stone-800/40 cursor-pointer"
-                                    onClick={() => openConfirm(user)}
-                                >
-                                    <td className="px-6 py-4 font-medium text-stone-800 dark:text-stone-100">
-                                        {user.full_name}
+                            rows.map((row) => (
+                                <tr key={row.review_id} className="hover:bg-blue-50/30 transition-colors">
+                                    <td className="px-6 py-4 font-bold text-[#333]">
+                                        {row.full_name}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-stone-600 dark:text-stone-300 truncate">
-                                        {user.email}
+
+                                    <td className="px-6 py-4 text-gray-700">
+                                        {row.product_name}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-stone-600 dark:text-stone-300">
-                                        {user.phone || "—"}
+
+                                    <td className="px-6 py-4 text-gray-600">
+                                        {row.variant_name}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-stone-600 dark:text-stone-300 truncate">
-                                        {user.address || "—"}
-                                    </td>
+
                                     <td className="px-6 py-4">
-                                        {user.is_deleted === 0 ? (
-                                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Hoạt động
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-red-100 text-red-700 border border-red-200">
-                                                Đã khóa
-                                            </span>
-                                        )}
+                                        <RatingStars value={row.rating || 0} />
+                                    </td>
+
+                                    <td className="px-6 py-4 text-sm text-gray-600 line-clamp-2">
+                                        {row.comment || "—"}
+                                    </td>
+
+                                    <td className="px-6 py-4 text-right">
+                                        <button className="text-red-500 hover:text-red-700 text-sm font-bold bg-red-50 hover:bg-red-100 px-3 py-1 rounded-full transition-colors">
+                                            Ẩn
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
                     </tbody>
                 </table>
             </div>
+        </div>
+    );
+}
 
-            {confirmOpen && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-stone-900 rounded-xl p-6 w-[360px]">
-                        <h3 className="text-lg font-bold text-stone-800 dark:text-white mb-4">
-                            Xác nhận thay đổi
-                        </h3>
-                        <p className="text-sm text-stone-600 dark:text-stone-300 mb-6">
-                            Bạn có chắc muốn {selectedUser?.is_deleted === 0 ? "khóa" : "mở khóa"} người dùng này?
-                        </p>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => setConfirmOpen(false)}
-                                className="px-4 py-2 rounded-lg border text-stone-600"
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                onClick={confirmToggle}
-                                className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold"
-                            >
-                                Xác nhận
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+function RatingStars({ value }) {
+    return (
+        <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <svg
+                    key={star}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill={star <= value ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={`w-4 h-4 ${star <= value ? "text-yellow-400" : "text-gray-300"}`}
+                >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+            ))}
         </div>
     );
 }

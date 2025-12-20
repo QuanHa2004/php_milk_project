@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
 const statusMap = {
-    pending: { label: "Chờ xử lý", cls: "bg-stone-100 text-stone-700 border-stone-200" },
-    processing: { label: "Đang xử lý", cls: "bg-amber-100 text-amber-800 border-amber-200" },
-    shipping: { label: "Đang giao", cls: "bg-blue-100 text-blue-800 border-blue-200" },
-    delivered: { label: "Đã thanh toán", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
-    cancelled: { label: "Đã hủy", cls: "bg-red-100 text-red-700 border-red-200" }
+    pending: { label: "Chờ xử lý", cls: "bg-gray-100 text-gray-600 border-gray-200" },
+    processing: { label: "Đang xử lý", cls: "bg-blue-50 text-blue-700 border-blue-100" },
+    shipping: { label: "Đang giao", cls: "bg-yellow-50 text-yellow-700 border-yellow-100" },
+    delivered: { label: "Đã thanh toán", cls: "bg-green-50 text-green-700 border-green-100" },
+    cancelled: { label: "Đã hủy", cls: "bg-red-50 text-red-700 border-red-100" }
 };
 
 export default function OrderList() {
@@ -29,23 +29,23 @@ export default function OrderList() {
     }, []);
 
     return (
-        <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full table-fixed text-left">
-                    <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
+                    <thead className="bg-[#f8f9fa] border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[12%]">Mã đơn</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[20%]">Khách hàng</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[16%]">Ngày đặt</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[14%]">Tổng tiền</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[18%]">Trạng thái</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[12%]">Mã đơn</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[20%]">Khách hàng</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[16%]">Ngày đặt</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[14%]">Tổng tiền</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[18%]">Trạng thái</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+                    <tbody className="divide-y divide-gray-100">
                         {isLoading ? (
                             <tr>
-                                <td colSpan="7" className="px-6 py-10 text-center text-stone-500">
+                                <td colSpan="7" className="px-6 py-10 text-center text-gray-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
@@ -55,33 +55,33 @@ export default function OrderList() {
                                 return (
                                     <tr
                                         key={item.order_id}
-                                        className="hover:bg-[#FAF9F6] dark:hover:bg-stone-800/30 transition-colors"
+                                        className="hover:bg-blue-50/30 transition-colors"
                                     >
-                                        <td className="px-6 py-4 font-mono font-semibold text-stone-700 dark:text-stone-200">
+                                        <td className="px-6 py-4 font-mono font-bold text-[#1a3c7e]">
                                             #{item.order_id}
                                         </td>
 
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-semibold text-stone-700 dark:text-stone-200">
+                                                <span className="font-bold text-[#333]">
                                                     {item.full_name}
                                                 </span>
-                                                <span className="text-xs text-stone-400">
+                                                <span className="text-xs text-gray-500 mt-0.5">
                                                     {item.phone}
                                                 </span>
                                             </div>
                                         </td>
 
-                                        <td className="px-6 py-4 text-sm text-stone-600 dark:text-stone-300">
+                                        <td className="px-6 py-4 text-sm text-gray-600">
                                             {new Date(item.order_date).toLocaleString("vi-VN")}
                                         </td>
 
-                                        <td className="px-6 py-4 font-bold text-stone-800 dark:text-stone-100">
-                                            {Number(item.total_amount).toLocaleString("vi-VN")} 
+                                        <td className="px-6 py-4 font-bold text-[#d32f2f]">
+                                            {Number(item.total_amount).toLocaleString("vi-VN")}
                                         </td>
 
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${status.cls}`}>
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${status.cls}`}>
                                                 {status.label}
                                             </span>
                                         </td>
@@ -90,7 +90,7 @@ export default function OrderList() {
                             })
                         ) : (
                             <tr>
-                                <td colSpan="5" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="5" className="px-6 py-12 text-center text-gray-400">
                                     Chưa có đơn hàng nào
                                 </td>
                             </tr>

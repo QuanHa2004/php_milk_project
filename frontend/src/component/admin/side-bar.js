@@ -27,7 +27,8 @@ export default function SideBar() {
     }
   }, []);
 
-  // Xử lý đăng xuất
+  console.log(currentUser);
+
   const handleLogOut = () => {
     updateToken(null);
     logOut();
@@ -142,28 +143,26 @@ export default function SideBar() {
     { icon: icons.review, text: "Đánh giá", url: "/admin/review" },
   ];
 
-  // Kiểm tra mục nào đang active dựa trên URL
   const isActive = (url) => {
     if (url === "/admin/dashboard" && location.pathname === "/admin/dashboard") return true;
     return location.pathname.startsWith(url) && url !== "/admin/dashboard";
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-[#EFECE5] dark:bg-[#151413] border-r border-stone-300 dark:border-stone-800 flex flex-col z-50 shadow-sm">
+    <aside className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col z-50 shadow-sm">
 
-      <div className="h-20 flex items-center px-6 border-b border-stone-300 dark:border-stone-800">
-        <div className="flex items-center gap-3 text-amber-900 dark:text-amber-500">
-          <div className="p-2 bg-amber-200/50 dark:bg-amber-900/30 text-amber-900 dark:text-amber-500 rounded-xl">
+      <div className="h-20 flex items-center px-6 border-b border-gray-100">
+        <div className="flex items-center gap-3 text-[#1a3c7e]">
+          <div className="p-2 bg-blue-50 text-[#1a3c7e] rounded-xl">
             {icons.store}
           </div>
-          <h1 className="text-xl font-black tracking-tight text-stone-800 dark:text-stone-100">
-            Fresh<span className="text-amber-800 dark:text-amber-600">Milk</span>
+          <h1 className="text-xl font-black tracking-tight text-[#1a3c7e]">
+            FreshMilk
           </h1>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-
         {navItems.map((item) => {
           const active = isActive(item.url);
           return (
@@ -171,53 +170,47 @@ export default function SideBar() {
               key={item.text}
               onClick={() => navigate(item.url)}
               className={`
-                w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden
+                w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group relative
                 ${active
-                  ? "bg-amber-900 text-white shadow-lg shadow-amber-900/20"
-                  : "text-stone-600 dark:text-stone-400 hover:bg-white/60 dark:hover:bg-stone-800 hover:text-amber-900 dark:hover:text-amber-400 hover:shadow-sm"
+                  ? "bg-[#1a3c7e] text-white shadow-lg shadow-blue-100"
+                  : "text-gray-500 hover:bg-blue-50 hover:text-[#1a3c7e]"
                 }
               `}
             >
-              <span className={`transition-transform duration-200 ${active ? "text-amber-100" : "text-stone-500 group-hover:text-amber-800 group-hover:scale-110"}`}>
+              <span className={`transition-transform duration-200 ${active ? "text-white" : "text-gray-400 group-hover:text-[#1a3c7e] group-hover:scale-110"}`}>
                 {item.icon}
               </span>
 
               <span>{item.text}</span>
-
-              {active && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-amber-100/30 rounded-l-full"></span>
-              )}
             </button>
           );
         })}
       </div>
 
-      <div className="p-4 border-t border-stone-300 dark:border-stone-800">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/50 border border-stone-300 dark:bg-stone-800 dark:border-stone-700 hover:bg-white hover:border-amber-300 transition-all cursor-pointer shadow-sm">
-
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-800 to-amber-600 flex items-center justify-center text-white font-bold shadow-sm border-2 border-white/50 dark:border-stone-700">
-            A
+      <div className="p-4 border-t border-gray-100">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-all cursor-pointer">
+          <div className="w-10 h-10 rounded-full bg-[#1a3c7e] flex items-center justify-center text-white font-bold text-lg">
+           Q
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-stone-800 dark:text-stone-100 truncate">
+            <p className="text-sm font-bold text-[#1a3c7e] truncate">
               {currentUser.full_name}
             </p>
-            <p className="text-xs text-stone-600 dark:text-stone-400 truncate">
+            <p className="text-xs text-gray-500 truncate">
               {currentUser.email}
             </p>
           </div>
 
           <button
             onClick={handleLogOut}
-            className="text-stone-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors p-1.5 rounded-lg"
+            className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors p-2 rounded-lg"
             title="Đăng xuất"
           >
             {icons.logout}
           </button>
         </div>
       </div>
-
     </aside>
   );
 }

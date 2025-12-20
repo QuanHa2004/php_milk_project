@@ -21,21 +21,21 @@ export default function ManufacturerList() {
     }, []);
 
     return (
-        <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full table-fixed text-left">
-                    <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
+                    <thead className="bg-[#f8f9fa] border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[30%]">Nhà cung cấp</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[30%]">Liên hệ</th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[40%]">Địa chỉ</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[30%]">Nhà cung cấp</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[30%]">Liên hệ</th>
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[40%]">Địa chỉ</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+                    <tbody className="divide-y divide-gray-100">
                         {isLoading ? (
                             <tr>
-                                <td colSpan="4" className="px-6 py-10 text-center text-stone-500">
+                                <td colSpan="4" className="px-6 py-10 text-center text-gray-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
@@ -43,11 +43,11 @@ export default function ManufacturerList() {
                             rows.map(item => (
                                 <tr
                                     key={item.supplier_id}
-                                    className="hover:bg-[#FAF9F6] dark:hover:bg-stone-800/30 transition-colors"
+                                    className="hover:bg-blue-50/30 transition-colors"
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-semibold text-stone-700 dark:text-stone-200">
+                                            <span className="font-bold text-[#333]">
                                                 {item.supplier_name}
                                             </span>
                                         </div>
@@ -55,23 +55,17 @@ export default function ManufacturerList() {
 
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col gap-1 text-sm">
-                                            <span className="text-stone-600 dark:text-stone-300 font-mono">
+                                            <span className="text-[#1a3c7e] font-bold">
                                                 {item.phone || "--"}
                                             </span>
-                                            <span
-                                                className="text-stone-500 dark:text-stone-400 truncate max-w-[220px]"
-                                                title={item.email}
-                                            >
+                                            <span className="text-gray-500 truncate max-w-[220px]" title={item.email}>
                                                 {item.email || "--"}
                                             </span>
                                         </div>
                                     </td>
 
                                     <td className="px-6 py-4">
-                                        <p
-                                            className="text-sm text-stone-600 dark:text-stone-300 line-clamp-2"
-                                            title={item.address}
-                                        >
+                                        <p className="text-sm text-gray-600 line-clamp-2" title={item.address}>
                                             {item.address || "--"}
                                         </p>
                                     </td>
@@ -79,7 +73,7 @@ export default function ManufacturerList() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="3" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="3" className="px-6 py-12 text-center text-gray-400">
                                     Chưa có nhà sản xuất nào
                                 </td>
                             </tr>

@@ -22,77 +22,66 @@ export default function InvoiceList() {
     }, []);
 
     return (
-        <div className="w-full overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1C1917] shadow-sm">
+        <div className="w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full table-fixed text-left">
-
-                    {/* HEADER */}
-                    <thead className="bg-[#F5F2EB] dark:bg-stone-800/50 border-b border-stone-200 dark:border-stone-700">
+                    <thead className="bg-[#f8f9fa] border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[15%]">
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[15%]">
                                 Mã phiếu
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[35%]">
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[35%]">
                                 Nhà cung cấp
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[25%]">
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[25%]">
                                 Tổng tiền
                             </th>
-                            <th className="px-6 py-4 text-xs font-bold text-stone-500 uppercase w-[15%]">
+                            <th className="px-6 py-4 text-xs font-bold text-[#1a3c7e] uppercase w-[15%]">
                                 Ngày nhập
                             </th>
                         </tr>
                     </thead>
 
-                    {/* BODY */}
-                    <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
-
-                        {/* Loading */}
+                    <tbody className="divide-y divide-gray-100">
                         {isLoading && (
                             <tr>
-                                <td colSpan="5" className="px-6 py-8 text-center text-stone-500">
+                                <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
                                     Đang tải dữ liệu...
                                 </td>
                             </tr>
                         )}
 
-                        {/* Empty */}
                         {!isLoading && rows.length === 0 && (
                             <tr>
-                                <td colSpan="4" className="px-6 py-12 text-center text-stone-400">
+                                <td colSpan="4" className="px-6 py-12 text-center text-gray-400">
                                     Chưa có phiếu nhập hàng nào.
                                 </td>
                             </tr>
                         )}
 
-                        {/* Rows */}
                         {!isLoading &&
                             rows.map((invoice) => (
                                 <tr
                                     key={invoice.invoice_id}
-                                    className="hover:bg-[#FAF9F6] dark:hover:bg-stone-800/30 transition-colors"
+                                    className="hover:bg-blue-50/30 transition-colors"
                                 >
-                                    {/* Invoice ID */}
                                     <td className="px-6 py-4">
-                                        <span className="font-mono text-sm font-bold text-amber-900 bg-amber-50 px-2 py-1 rounded border border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50">
+                                        <span className="font-mono text-sm font-bold text-[#1a3c7e] bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
                                             #{invoice.invoice_id}
                                         </span>
                                     </td>
 
-                                    {/* Supplier */}
                                     <td className="px-6 py-4">
-                                        <span className="font-semibold text-stone-700 dark:text-stone-200">
+                                        <span className="font-bold text-[#333]">
                                             {invoice.supplier_name}
                                         </span>
                                     </td>
 
-                                    {/* Total */}
-                                    <td className="px-6 py-4 text-sm font-bold text-stone-800 dark:text-stone-100">
-                                        {Number(invoice.total_amount).toLocaleString("vi-VN")} 
+                                    <td className="px-6 py-4 text-sm font-bold text-[#d32f2f]">
+                                        {Number(invoice.total_amount).toLocaleString("vi-VN")}
                                     </td>
 
-                                    {/* Date */}
-                                    <td className="px-6 py-4 text-sm text-stone-500 dark:text-stone-400">
+                                    <td className="px-6 py-4 text-sm text-gray-600">
                                         {new Date(invoice.created_at).toLocaleDateString("vi-VN")}
                                     </td>
                                 </tr>
