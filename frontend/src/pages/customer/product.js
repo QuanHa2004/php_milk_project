@@ -3,28 +3,41 @@ import Footer from '../../component/customer/footer';
 import ProductOption from '../../component/customer/product-option';
 
 export default function Product() {
+
     return (
-        <div className="bg-white dark:bg-background-dark font-display text-text-color">
-            <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-                <div className="layout-container flex h-full grow flex-col">
-                    <div className="layout-content-container flex flex-col w-full flex-1">
-                        <Header />
+        <div className="bg-[#f8f9fa] font-sans text-[#333]">
+            <div className="relative flex min-h-screen w-full flex-col">
+                <Header />
 
-                        <main className="flex-grow px-4 md:px-10 lg:px-40 py-5 mt-20">
-                            <section className="px-4 md:px-10 lg:px-40 py-5">
-                                <div className="flex flex-wrap justify-between gap-3 p-4">
-                                    <p className="text-4xl font-black leading-tight tracking-[-0.033em] min-w-72 text-[#111618] dark:text-white">
-                                        Our Fresh Milk Selection
-                                    </p>
-                                </div>
-                            </section>
+                <main className="flex-grow pt-32 pb-20">
+                    <div className="container mx-auto px-4 md:px-10 lg:px-20">
 
+                        {/* Banner Section (Optional decoration to match Vinamilk style) */}
+                        <div className="w-full h-48 md:h-64 bg-blue-50 rounded-2xl mb-10 relative overflow-hidden flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#1a3c7e] to-[#4096ff] opacity-10"></div>
+                            <div className="text-center z-10 px-4">
+                                <h2 className="text-[#1a3c7e] text-2xl md:text-3xl font-bold mb-2">Nguồn Dinh Dưỡng Xanh</h2>
+                                <p className="text-gray-600">Thơm ngon - Thuần khiết - Tự nhiên</p>
+                            </div>
+                        </div>
+
+                        {/* Title Section */}
+                        <div className="text-center mb-10">
+                            <h1 className="text-[#1a3c7e] text-3xl md:text-4xl font-bold uppercase tracking-wide mb-3">
+                                Our Fresh Milk Selection
+                            </h1>
+                            <div className="w-24 h-1 bg-[#1a3c7e] mx-auto rounded-full"></div>
+                        </div>
+
+                        {/* Product Options / Filter & Grid */}
+                        <div className="bg-transparent">
                             <ProductOption />
-                        </main>
+                        </div>
 
-                        <Footer />
                     </div>
-                </div>
+                </main>
+
+                <Footer />
             </div>
         </div>
     );

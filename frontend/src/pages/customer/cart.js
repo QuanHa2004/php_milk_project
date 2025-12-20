@@ -71,62 +71,77 @@ export default function Cart() {
     };
 
     return (
-        <div className="bg-white dark:bg-background-dark font-display text-text-color">
-            <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-                <div className="layout-container flex h-full grow flex-col">
-                    <Header />
+        <div className="bg-[#f8f9fa] font-sans text-[#333]">
+            <div className="relative flex min-h-screen w-full flex-col">
+                <Header />
 
-                    <main className="flex-1 px-4 sm:px-6 lg:px-8 py-10 mt-10">
-                        <section className="px-4 md:px-10 lg:px-40 py-5">
-                            <div className="max-w-6xl mx-auto">
+                <main className="flex-grow pt-32 pb-20">
+                    <div className="container mx-auto px-4 md:px-10 lg:px-20">
+                        <div className="flex items-center gap-2 mb-8">
+                            <span className="text-gray-500 cursor-pointer hover:text-[#1a3c7e]" onClick={() => navigate('/')}>Trang chủ</span>
+                            <span className="text-gray-400">/</span>
+                            <span className="text-[#1a3c7e] font-semibold">Giỏ hàng</span>
+                        </div>
 
-                                <div className="flex flex-wrap justify-between gap-3 p-4">
-                                    <p className="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">
-                                        Giỏ hàng của bạn
-                                    </p>
+                        <div className="mb-8">
+                            <h1 className="text-[#1a3c7e] text-3xl font-bold uppercase tracking-wide">
+                                Giỏ hàng của bạn
+                            </h1>
+                        </div>
+
+                        <div className="flex flex-col lg:flex-row gap-8">
+                            <div className="w-full lg:w-2/3">
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                                    <div className="p-6 md:p-8">
+                                        <CartItem />
+                                    </div>
                                 </div>
 
-                                <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
-                                    <div className="lg:col-span-2 space-y-6">
-
-                                        <CartItem />
-
-                                        <div className="flex px-4 py-3 justify-start">
-                                            <button
-                                                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-transparent text-primary text-sm font-bold border-2 border-primary hover:bg-primary/10"
-                                                onClick={() => navigate('/products')}
-                                            >
-                                                Tiếp tục mua hàng
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="lg:col-span-1">
-                                        <div className="bg-white dark:bg-background-dark p-6 rounded-lg shadow-sm sticky top-10">
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-4">
-                                                Tóm tắt đơn hàng
-                                            </h3>
-
-                                            <CartSummary />
-
-                                            <div>
-                                                <button
-                                                    className="mt-6 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold hover:bg-primary/90"
-                                                    onClick={handleCheckOut}
-                                                >
-                                                    Tiến hành thanh toán
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                <div className="flex justify-start">
+                                    <button
+                                        onClick={() => navigate('/products')}
+                                        className="group flex items-center gap-2 text-[#1a3c7e] font-bold py-3 px-6 rounded-full border border-[#1a3c7e] hover:bg-[#1a3c7e] hover:text-white transition-all duration-300"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                                        </svg>
+                                        Tiếp tục mua hàng
+                                    </button>
                                 </div>
                             </div>
-                        </section>
-                    </main>
 
-                    <Footer />
-                </div>
+                            <div className="w-full lg:w-1/3">
+                                <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] sticky top-32 p-6 border border-gray-100">
+                                    <h3 className="text-[#1a3c7e] text-xl font-bold uppercase border-b-2 border-[#1a3c7e] pb-3 mb-6 inline-block">
+                                        Tóm tắt đơn hàng
+                                    </h3>
+
+                                    <div className="space-y-4">
+                                        <CartSummary />
+                                    </div>
+
+                                    <div className="mt-8 pt-6 border-t border-gray-100">
+                                        <button
+                                            onClick={handleCheckOut}
+                                            className="w-full bg-gradient-to-r from-[#1a3c7e] to-[#2b55a3] text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300 uppercase tracking-wide"
+                                        >
+                                            Tiến hành thanh toán
+                                        </button>
+
+                                        <div className="mt-4 text-center">
+                                            <p className="text-gray-500 text-xs">
+                                                Bằng việc tiến hành thanh toán, bạn đồng ý với
+                                                <span className="text-[#1a3c7e] underline cursor-pointer ml-1">Điều khoản dịch vụ</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <Footer />
             </div>
         </div>
     );

@@ -90,118 +90,153 @@ export default function Checkout() {
     };
 
     return (
-        <div className="bg-white dark:bg-background-dark font-display text-text-color">
-            <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <div className="bg-[#f8f9fa] font-sans text-[#333]">
+            <div className="relative flex min-h-screen w-full flex-col">
                 <Header />
 
-                <main className="flex-1 px-4 sm:px-6 lg:px-10 py-8">
-                    <section className="w-full max-w-6xl mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <main className="flex-grow pt-32 pb-20">
+                    <div className="container mx-auto px-4 md:px-10 lg:px-20">
 
-                            <div className="space-y-8">
-                                <div>
-                                    <h2 className="text-[#111618] dark:text-white text-[22px] font-bold px-4 pb-3 pt-5 flex items-center gap-2">
+                        <div className="flex items-center gap-2 mb-8">
+                            <span className="text-gray-500 cursor-pointer hover:text-[#1a3c7e]" onClick={() => navigate('/cart')}>Giỏ hàng</span>
+                            <span className="text-gray-400">/</span>
+                            <span className="text-[#1a3c7e] font-semibold">Thanh toán</span>
+                        </div>
+
+                        <div className="mb-8">
+                            <h1 className="text-[#1a3c7e] text-3xl font-bold uppercase tracking-wide">
+                                Thanh toán
+                            </h1>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
+                                    <h2 className="text-[#1a3c7e] text-xl font-bold flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                                        <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
                                         Phương thức thanh toán
-                                        <span className="material-symbols-outlined text-xl text-gray-400">lock</span>
                                     </h2>
 
-                                    <div className="px-4 py-3 space-y-4">
-                                        <div
-                                            className={`flex items-center gap-4 rounded-lg border p-4 cursor-pointer ${formData.paymentMethod === 'VNPAY'
-                                                    ? 'border-primary ring-2 ring-primary bg-blue-50'
-                                                    : 'border-[#dbe2e6]'
-                                                }`}
+                                    <div className="space-y-4">
+                                        <label
+                                            className={`relative flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+                        ${formData.paymentMethod === 'VNPAY'
+                                                    ? 'border-[#1a3c7e] bg-blue-50/30'
+                                                    : 'border-gray-100 hover:border-blue-200'}`}
                                             onClick={() => handlePaymentChange('VNPAY')}
                                         >
-                                            <input
-                                                checked={formData.paymentMethod === 'VNPAY'}
-                                                readOnly
-                                                className="form-radio h-5 w-5 text-primary"
-                                                type="radio"
-                                            />
-                                            <div className="flex-1">
-                                                <p className="font-bold text-[#111618]">
-                                                    Ví VNPAY / Thẻ ATM / QR Code
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    Thanh toán an toàn qua cổng VNPay
-                                                </p>
+                                            <div className="flex items-center justify-center">
+                                                <input
+                                                    type="radio"
+                                                    name="payment"
+                                                    checked={formData.paymentMethod === 'VNPAY'}
+                                                    readOnly
+                                                    className="w-5 h-5 accent-[#1a3c7e]"
+                                                />
                                             </div>
-                                            <img
-                                                src="https://sandbox.vnpayment.vn/paymentv2/images/logo-vnpay@2x.png"
-                                                alt="VNPay"
-                                                className="h-8"
-                                            />
-                                        </div>
 
-                                        <div
-                                            className={`flex items-center gap-4 rounded-lg border p-4 cursor-pointer ${formData.paymentMethod === 'COD'
-                                                    ? 'border-primary ring-2 ring-primary bg-blue-50'
-                                                    : 'border-[#dbe2e6]'
-                                                }`}
+                                            <div className="flex-1">
+                                                <p className="font-bold text-[#333] text-lg">Ví VNPAY / Thẻ ATM / QR Code</p>
+                                                <p className="text-sm text-gray-500 mt-1">Thanh toán an toàn, nhanh chóng qua cổng VNPAY</p>
+                                            </div>
+
+                                            <div className="h-8 md:h-10 w-auto bg-white rounded px-2 py-1 flex items-center justify-center border border-gray-100">
+                                                <img
+                                                    src="https://sandbox.vnpayment.vn/paymentv2/images/logo-vnpay@2x.png"
+                                                    alt="VNPAY"
+                                                    className="h-full object-contain"
+                                                />
+                                            </div>
+                                        </label>
+
+                                        <label
+                                            className={`relative flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+                                            ${formData.paymentMethod === 'COD'
+                                                    ? 'border-[#1a3c7e] bg-blue-50/30'
+                                                    : 'border-gray-100 hover:border-blue-200'}`}
                                             onClick={() => handlePaymentChange('COD')}
                                         >
-                                            <input
-                                                checked={formData.paymentMethod === 'COD'}
-                                                readOnly
-                                                className="form-radio h-5 w-5 text-primary"
-                                                type="radio"
-                                            />
-                                            <div className="flex-1">
-                                                <p className="font-bold text-[#111618]">
-                                                    Thanh toán khi nhận hàng (COD)
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    Thanh toán tiền mặt cho shipper
-                                                </p>
+                                            <div className="flex items-center justify-center">
+                                                <input
+                                                    type="radio"
+                                                    name="payment"
+                                                    checked={formData.paymentMethod === 'COD'}
+                                                    readOnly
+                                                    className="w-5 h-5 accent-[#1a3c7e]"
+                                                />
                                             </div>
-                                            <span className="material-symbols-outlined text-3xl text-gray-600">
-                                                local_shipping
-                                            </span>
-                                        </div>
+
+                                            <div className="flex-1">
+                                                <p className="font-bold text-[#333] text-lg">Thanh toán khi nhận hàng (COD)</p>
+                                                <p className="text-sm text-gray-500 mt-1">Thanh toán bằng tiền mặt cho nhân viên giao hàng</p>
+                                            </div>
+
+                                            <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
+                                                <span className="material-symbols-outlined">local_shipping</span>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
 
-                                {/* <div className="bg-white dark:bg-background-dark/50 rounded-xl p-6 border border-[#dbe2e6] dark:border-gray-700">
-                                    <h2 className="text-[#111618] dark:text-white text-[22px] font-bold mb-6">
-                                        Voucher
-                                    </h2>
+                                <div
+                                    class="mt-8 bg-white dark:bg-background-dark/50 rounded-xl p-6 border border-[#dbe2e6] dark:border-gray-700">
+                                    <h2
+                                        class="text-[#111618] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-6">
+                                        Những voucher đang có</h2>
                                     <Voucher />
-                                </div> */}
+                                </div>
                             </div>
 
                             <div className="lg:col-span-1">
-                                <div className="bg-white dark:bg-background-dark/50 rounded-xl p-6 border border-[#dbe2e6] sticky top-24">
-                                    <h2 className="text-[#111618] dark:text-white text-[22px] font-bold mb-6">
+                                <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] sticky top-32 p-6 border border-gray-100">
+                                    <h3 className="text-[#1a3c7e] text-xl font-bold uppercase border-b-2 border-[#1a3c7e] pb-3 mb-6 inline-block">
                                         Đơn hàng của bạn
-                                    </h2>
+                                    </h3>
 
-                                    <CartSummary/>
+                                    <div className="mb-6">
+                                        <CartSummary showPaymentSection={true} />
+                                    </div>
 
                                     {error && (
-                                        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                                            {error}
+                                        <div className="mb-4 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex items-start gap-2">
+                                            <span className="material-symbols-outlined text-lg">error</span>
+                                            <span>{error}</span>
                                         </div>
                                     )}
 
                                     <button
                                         onClick={handleCheckout}
                                         disabled={loading}
-                                        className={`w-full mt-8 flex items-center justify-center rounded-lg h-14 text-white text-lg font-bold transition-all ${loading
-                                                ? 'bg-gray-400 cursor-not-allowed'
-                                                : 'bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl'
+                                        className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transition-all duration-300 transform hover:-translate-y-1
+                                        ${loading
+                                                ? 'bg-gray-300 text-white cursor-not-allowed shadow-none'
+                                                : 'bg-gradient-to-r from-[#1a3c7e] to-[#2b55a3] text-white hover:shadow-blue-200'
                                             }`}
                                     >
-                                        {loading
-                                            ? 'Đang xử lý...'
-                                            : formData.paymentMethod === 'VNPAY'
-                                                ? 'Thanh toán VNPay'
-                                                : 'Đặt hàng ngay'}
+                                        {loading ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Đang xử lý...
+                                            </span>
+                                        ) : (
+                                            formData.paymentMethod === 'VNPAY' ? 'Thanh toán VNPAY' : 'Đặt hàng ngay'
+                                        )}
                                     </button>
+
+                                    <div className="mt-4 text-center">
+                                        <p className="text-gray-400 text-xs">
+                                            Cam kết bảo mật thông tin thanh toán
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
-                    </section>
+                    </div>
                 </main>
 
                 <Footer />

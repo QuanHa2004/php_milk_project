@@ -55,112 +55,115 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white px-4 md:px-10 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-primary/30 py-3">
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-4 text-secondary">
-          <div className="size-8">
-            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <g clipPath="url(#clip0_6_319)">
-                <path d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z" />
-              </g>
-              <defs>
-                <clipPath id="clip0_6_319">
-                  <rect fill="white" height="48" width="48" />
-                </clipPath>
-              </defs>
-            </svg>
-          </div>
-          <h1 className="text-xl font-black tracking-tight text-stone-800 dark:text-stone-100">
-            <span className="text-amber-800 dark:text-amber-600">Fresh Milk</span>
+    <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-md border-b border-gray-100 font-sans transition-all duration-300">
+      <div className="container mx-auto px-4 md:px-10 h-20 flex items-center justify-between">
+
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => navigate("/")}
+        >
+          <h1 className="hidden sm:block text-xl md:text-2xl font-bold tracking-tighter text-[#1a3c7e] uppercase">
+            Fresh Milk
           </h1>
         </div>
 
-        <nav className="hidden md:flex items-center gap-9">
+        <nav className="hidden lg:flex items-center gap-8">
           <button
-            className="text-text-color text-base font-medium leading-normal hover:text-primary"
+            className="text-[#1a3c7e] text-sm font-bold uppercase tracking-wide hover:text-[#4096ff] hover:bg-blue-50 px-4 py-2 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-[#4096ff] hover:after:w-1/2 after:transition-all"
             onClick={() => navigate("/")}
           >
             Trang chủ
           </button>
 
           <button
-            className="text-text-color text-base font-medium leading-normal hover:text-primary"
+            className="text-[#1a3c7e] text-sm font-bold uppercase tracking-wide hover:text-[#4096ff] hover:bg-blue-50 px-4 py-2 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-[#4096ff] hover:after:w-1/2 after:transition-all"
             onClick={() => navigate("/products")}
           >
             Sản phẩm
           </button>
 
-          <label className="flex flex-col min-w-40 !h-10 max-w-sm w-full">
-            <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
-              <div
-                onClick={handleSearch}
-                className="text-text-secondary dark:text-gray-400 flex border-none bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0"
-              >
-                <span className="material-symbols-outlined">search</span>
-              </div>
-
+          <div className="relative group w-64 xl:w-80">
+            <div className="flex w-full items-center rounded-full bg-[#f4f7fc] border border-transparent group-focus-within:border-[#1a3c7e] group-focus-within:bg-white group-focus-within:shadow-md transition-all duration-300 h-10 overflow-hidden">
               <input
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary border-none bg-gray-100 dark:bg-gray-800 h-full placeholder:text-text-secondary dark:placeholder-gray-400 px-4 text-base font-normal leading-normal"
-                placeholder="Tìm kiếm sản phẩm"
+                className="w-full bg-transparent border-none outline-none text-sm text-[#333] px-4 placeholder-gray-400"
+                placeholder="Tìm kiếm sản phẩm..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSearch();
                 }}
               />
+              <button
+                onClick={handleSearch}
+                className="flex items-center justify-center w-10 h-full text-[#1a3c7e] hover:bg-blue-100 transition-colors"
+              >
+                <span className="material-symbols-outlined text-xl">search</span>
+              </button>
             </div>
-          </label>
+          </div>
         </nav>
-      </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative">
-          {currentUser?.full_name ? (
-            <details className="relative group">
-              <summary className="flex items-center gap-2 bg-primary/20 text-secondary px-3 py-2 rounded-full hover:bg-primary/30 transition-colors list-none cursor-pointer">
-                <span className="material-symbols-outlined text-2xl">person</span>
-                <p className="font-medium">{currentUser.full_name}</p>
-              </summary>
-
-              <div className="flex flex-col absolute right-0 mt-2 w-28 bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg py-2 z-50">
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                >
-                  Hồ sơ
+        <div className="flex items-center gap-3 md:gap-5">
+          <div className="relative">
+            {currentUser?.full_name ? (
+              <div className="relative group/user">
+                <button className="flex items-center gap-2 text-[#1a3c7e] hover:bg-blue-50 px-3 py-1.5 rounded-full transition-all duration-200">
+                  <div className="w-8 h-8 rounded-full bg-[#1a3c7e] text-white flex items-center justify-center text-sm font-bold uppercase">
+                    {currentUser.full_name.charAt(0)}
+                  </div>
+                  <span className="hidden md:block font-bold text-sm max-w-[100px] truncate">
+                    {currentUser.full_name}
+                  </span>
+                  <span className="material-symbols-outlined text-lg">expand_more</span>
                 </button>
 
-                <button
-                  onClick={handleLogOut}
-                  className="w-full text-left px-4 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                >
-                  Đăng xuất
-                </button>
+                <div className="absolute right-0 top-full pt-2 w-48 opacity-0 invisible group-hover/user:opacity-100 group-hover/user:visible transition-all duration-200 transform translate-y-2 group-hover/user:translate-y-0 z-50">
+                  <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden py-1">
+                    <button
+                      onClick={() => navigate("/profile")}
+                      className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-[#1a3c7e] flex items-center gap-2 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg">person</span>
+                      Hồ sơ cá nhân
+                    </button>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={handleLogOut}
+                      className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg">logout</span>
+                      Đăng xuất
+                    </button>
+                  </div>
+                </div>
               </div>
-            </details>
-          ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="flex items-center gap-2 bg-primary/20 text-secondary px-3 py-2 rounded-full hover:bg-primary/30 transition-colors"
-            >
-              <span className="material-symbols-outlined">person</span>
-              <p>Đăng nhập</p>
-            </button>
-          )}
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="flex items-center gap-2 text-[#1a3c7e] font-bold text-sm hover:bg-blue-50 px-4 py-2 rounded-full transition-all duration-200"
+              >
+                <span className="material-symbols-outlined text-xl">account_circle</span>
+                <span className="hidden md:inline">Đăng nhập</span>
+              </button>
+            )}
+          </div>
+
+          <button
+            className="relative p-2 text-[#1a3c7e] hover:bg-blue-50 rounded-full transition-colors group"
+            onClick={() => navigate("/carts")}
+          >
+            <span className="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">shopping_bag</span>
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 bg-[#d32f2f] text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm transform translate-x-1 -translate-y-1">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
+          <button className="lg:hidden p-2 text-[#1a3c7e]">
+            <span className="material-symbols-outlined text-2xl">menu</span>
+          </button>
         </div>
-
-        <button
-          className="relative flex items-center justify-center rounded-full h-10 w-10 bg-primary/20 text-secondary hover:bg-primary/30 transition-colors"
-          onClick={() => navigate("/carts")}
-        >
-          <span className="material-symbols-outlined">shopping_cart</span>
-
-          {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-              {totalItems}
-            </span>
-          )}
-        </button>
       </div>
     </header>
   );

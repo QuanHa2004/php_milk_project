@@ -56,9 +56,7 @@ class Promotion
             LEFT JOIN user_promotion up
                 ON p.promo_id = up.promo_id
                 AND up.user_id = :user_id
-            WHERE p.is_active = 1
-            AND p.start_date <= NOW()
-            AND p.end_date >= NOW()
+            WHERE p.is_active = 0
             AND up.user_promotion_id IS NULL
             AND (p.max_uses IS NULL OR p.uses_count < p.max_uses)
             ORDER BY p.end_date ASC
