@@ -7,10 +7,16 @@ export default function useCart() {
 }
 
 export function CartProvider({ children }) {
+  // -----------------------------
+  // STATE QUẢN LÝ
+  // -----------------------------
   const [cartItems, setCartItems] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("access_token"));
 
-  // Lấy dữ liệu giỏ hàng từ localStorage nếu có
+  // -----------------------------
+  // KHỞI TẠO & ĐỒNG BỘ
+  // -----------------------------
+  // Lấy giỏ hàng từ localStorage khi load trang
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
@@ -26,12 +32,13 @@ export function CartProvider({ children }) {
     }
   }, [token]);
 
-  // Cập nhật token khi đăng nhập
+  // -----------------------------
+  // QUẢN LÝ TOKEN & PHIÊN
+  // -----------------------------
   const updateToken = (newToken) => {
     setToken(newToken);
   };
 
-  // Đăng xuất
   const logOut = () => {
     setCartItems([]);
     localStorage.removeItem("access_token");
@@ -40,7 +47,9 @@ export function CartProvider({ children }) {
     localStorage.removeItem("cart");
   };
 
-  // Lấy giỏ hàng của người dùng hiện tại
+  // -----------------------------
+  // ĐỒNG BỘ DỮ LIỆU
+  // -----------------------------
   const fetchCartItems = async () => {
     if (!token) return;
 
@@ -55,7 +64,6 @@ export function CartProvider({ children }) {
       if (!res.ok) throw new Error("Thất bại");
 
       const data = await res.json();
-
       setCartItems(data.items || []);
     } catch (err) {
       console.error(err);
@@ -63,8 +71,6 @@ export function CartProvider({ children }) {
     }
   };
 
-
-  // Đồng bộ giỏ hàng localStorage lên backend sau khi đăng nhập
   const syncLocalCartToBackend = async (token) => {
     if (!token) return;
 
@@ -73,13 +79,11 @@ export function CartProvider({ children }) {
 
     const cartData = JSON.parse(localCart);
     for (const item of cartData) {
-      console.log(item.batch_id);
-
       await addToCart(
         {
           variant_id: item.variant_id,
-          batch_id: item.batch_id, // ✅ QUAN TRỌNG
-          is_checked: item.is_checked ?? false
+          batch_id: item.batch_id,
+          is_checked: item.is_checked ?? false,
         },
         item.quantity
       );
@@ -88,13 +92,11 @@ export function CartProvider({ children }) {
     localStorage.removeItem("cart");
   };
 
-
-
-  // Thêm sản phẩm vào giỏ hàng
+  // -----------------------------
+  // THAO TÁC GIỎ HÀNG
+  // -----------------------------
   const addToCart = async (product, quantity) => {
-    // ===============================
     // KHÁCH CHƯA LOGIN → LOCALSTORAGE
-    // ===============================
     if (!token) {
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -117,7 +119,7 @@ export function CartProvider({ children }) {
           is_checked: false,
           volume: product.volume,
           packaging_type: product.packaging_type,
-          batch_id: product.batch_id, // ✅ GIỮ FIFO
+          batch_id: product.batch_id,
         });
       }
 
@@ -125,9 +127,8 @@ export function CartProvider({ children }) {
       setCartItems(cart);
       return;
     }
-    // ===============================
+
     // USER ĐÃ LOGIN → BACKEND
-    // ===============================
     try {
       const res = await fetch("http://localhost:8000/carts/add", {
         method: "POST",
@@ -137,36 +138,31 @@ export function CartProvider({ children }) {
         },
         body: JSON.stringify({
           variant_id: product.variant_id,
-          batch_id: product.batch_id, // ✅ BẮT BUỘC
+          batch_id: product.batch_id,
           quantity,
           is_checked: false,
         }),
       });
 
       if (!res.ok) throw new Error("Không thể thêm sản phẩm");
-
       await fetchCartItems();
     } catch (err) {
       console.error(err);
     }
   };
 
-
-
-  // Xóa sản phẩm khỏi giỏ hàng
   const removeFromCart = async (variant_id, batch_id) => {
     if (!token) {
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
       cart = cart.filter(
         (item) =>
           !(item.variant_id === variant_id && item.batch_id === batch_id)
       );
-
       localStorage.setItem("cart", JSON.stringify(cart));
       setCartItems(cart);
       return;
     }
+
     try {
       const res = await fetch("http://localhost:8000/carts/remove", {
         method: "DELETE",
@@ -190,16 +186,12 @@ export function CartProvider({ children }) {
     }
   };
 
-
-  // Cập nhật số lượng sản phẩm
   const updateQuantity = async (variant_id, batch_id, quantity) => {
     if (!token) {
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
       const item = cart.find(
         (i) => i.variant_id === variant_id && i.batch_id === batch_id
       );
-
       if (item) item.quantity = quantity;
 
       localStorage.setItem("cart", JSON.stringify(cart));
@@ -231,7 +223,6 @@ export function CartProvider({ children }) {
     }
   };
 
-
   const increase = (variant_id, batch_id) => {
     const item = cartItems.find(
       (p) => p.variant_id === variant_id && p.batch_id === batch_id
@@ -247,20 +238,23 @@ export function CartProvider({ children }) {
       updateQuantity(variant_id, batch_id, item.quantity - 1);
   };
 
-
+  // -----------------------------
+  // PROVIDER
+  // -----------------------------
   return (
     <CartContext.Provider
       value={{
         cartItems,
-        logOut,
+        setCartItems,
         updateToken,
+        logOut,
         fetchCartItems,
+        syncLocalCartToBackend,
         addToCart,
         removeFromCart,
         updateQuantity,
         increase,
         decrease,
-        setCartItems,
       }}
     >
       {children}

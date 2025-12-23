@@ -1,4 +1,4 @@
-import SideBar from "../../component/admin/side-bar";
+import SideBar from "../../component/side-bar";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {

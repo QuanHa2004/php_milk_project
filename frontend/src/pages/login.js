@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useCart from '../context/cart-context'; // Đảm bảo đường dẫn import đúng với dự án của bạn
+import useCart from "../context/cart-context"; // Đảm bảo đường dẫn import đúng với dự án của bạn
 
 export default function Login() {
   const navigate = useNavigate();

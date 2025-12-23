@@ -1,38 +1,30 @@
 import { Route, Routes } from 'react-router-dom';
-import ProtectedRoutes from './protected-routes';
-
-// auth
+import AddCategory from '../pages/admin/category/add-category';
+import CategoryManagement from '../pages/admin/category/category-management';
+import Dashboard from '../pages/admin/dashboard';
+import AddInvoice from '../pages/admin/invoice/add-invoice';
+import InvoiceManagement from '../pages/admin/invoice/invoice-management';
+import AddManufacturer from '../pages/admin/manufacturer/add-manufacturer';
+import ManufacturerManagement from '../pages/admin/manufacturer/manufacturer-management';
+import Order from '../pages/admin/order/order-management';
+import AddProduct from '../pages/admin/product/add-product';
+import ProductManagement from '../pages/admin/product/product-management';
+import CreatePromotion from '../pages/admin/promotion/create-promotion';
+import PromotionManagement from '../pages/admin/promotion/promotion-management';
+import AddSupplier from '../pages/admin/supplier/add-supplier';
+import SupplierManagement from '../pages/admin/supplier/supplier-management';
+import UserManagement from '../pages/admin/user/user-management';
+import Cart from '../pages/customer/cart/cart';
+import Checkout from '../pages/customer/checkout/checkout';
+import CheckoutFailed from "../pages/customer/checkout/checkout-failed";
+import CheckoutSuccess from '../pages/customer/checkout/checkout-success';
+import Home from '../pages/customer/home/home';
+import ProductDetail from '../pages/customer/product-detail/product-detail';
+import Product from '../pages/customer/product-option/product';
+import Profile from '../pages/customer/user/profile';
 import Login from '../pages/login';
 import Registration from '../pages/registration';
-
-// admin pages
-import Dashboard from '../pages/admin/dashboard';
-import Order from '../pages/admin/order-management';
-import CategoryManagement from '../pages/admin/category-management';
-import ProductManagement from '../pages/admin/product-management';
-import PromotionManagement from '../pages/admin/promotion-management';
-import InvoiceManagement from '../pages/admin/invoice-management';
-import UserManagement from '../pages/admin/user-management';
-import ManufacturerManagement from '../pages/admin/manufacturer-management';
-import SupplierManagement from '../pages/admin/supplier-management';
-import AddCategory from '../pages/admin/add-category';
-import AddProduct from '../pages/admin/add-product';
-import CreatePromotion from '../pages/admin/create-promotion';
-import AddInvoice from '../pages/admin/add-invoice';
-import AddManufacturer from '../pages/admin/add-manufacturer';
-import AddSupplier from '../pages/admin/add-supplier';
-import ReviewManagement from '../pages/admin/review-management';
-
-
-// customer pages
-import Home from '../pages/customer/home';
-import Profile from '../pages/customer/profile';
-import Product from '../pages/customer/product';
-import ProductDetail from '../pages/customer/product-detail';
-import Cart from '../pages/customer/cart';
-import Checkout from '../pages/customer/checkout';
-import CheckoutSuccess from "../pages/customer/checkout-success";
-import CheckoutFailed from "../pages/customer/checkout-failed";
+import ProtectedRoutes from './protected-routes';
 
 export default function AppRoutes() {
   return (
@@ -51,7 +43,6 @@ export default function AppRoutes() {
         <Route path="/admin/user" element={<UserManagement />} />
         <Route path="/admin/manufacturer" element={<ManufacturerManagement />} />
         <Route path="/admin/supplier" element={<SupplierManagement />} />
-        <Route path="/admin/review" element={<ReviewManagement />} />
         <Route path="/admin/add-category" element={<AddCategory />} />
         <Route path="/admin/add-product" element={<AddProduct />} />
         <Route path="/admin/create-promotion" element={<CreatePromotion />} />
