@@ -28,7 +28,7 @@ export default function InvoiceManagement() {
                 </div>
 
                 <button
-                  onClick={() => navigate('/admin/invoice/add')}
+                  onClick={() => navigate('/admin/add-invoice')}
                   className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#1a3c7e] text-white text-sm font-bold tracking-wide hover:bg-[#15326d] hover:-translate-y-0.5 transition-all shadow-md shadow-blue-100"
                 >
                   <span className="truncate flex items-center gap-2">

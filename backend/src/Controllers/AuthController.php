@@ -69,7 +69,7 @@ class AuthController
                     ]);
 
                     // Đảm bảo giỏ hàng tồn tại (an toàn)
-                    \Models\Cart::findOrCreate($existingUser['user_id']);
+                    Cart::findOrCreate($existingUser['user_id']);
 
                     Response::json(['message' => 'Liên kết tài khoản thành công!']);
                     return;

@@ -99,7 +99,6 @@ export default function Footer() {
             <div className="flex gap-4">
               {['facebook', 'youtube', 'tiktok', 'instagram'].map((social) => (
                 <p key={social} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-[#1a3c7e] transition-all cursor-pointer">
-                  <img src={`https://cdn-icons-png.flaticon.com/512/5968/${social === 'facebook' ? '5968764' : social === 'youtube' ? '5968852' : social === 'tiktok' ? '3046121' : '5968776'}.png`} alt={social} className="w-5 h-5 opacity-80" />
                 </p>
               ))}
             </div>

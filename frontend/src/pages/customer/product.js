@@ -9,7 +9,7 @@ export default function Product() {
             <div className="relative flex min-h-screen w-full flex-col">
                 <Header />
 
-                <main className="flex-grow pt-32 pb-20">
+                <main className="flex-grow pt-36 pb-20">
                     <div className="container mx-auto px-4 md:px-10 lg:px-20">
 
                         {/* Banner Section (Optional decoration to match Vinamilk style) */}
@@ -22,7 +22,7 @@ export default function Product() {
                         </div>
 
                         {/* Title Section */}
-                        <div className="text-center mb-10">
+                        <div className="text-center mb-0">
                             <h1 className="text-[#1a3c7e] text-3xl md:text-4xl font-bold uppercase tracking-wide mb-3">
                                 Our Fresh Milk Selection
                             </h1>

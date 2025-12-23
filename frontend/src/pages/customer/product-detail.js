@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"; // 1. Thêm useSearchParams
 import { useState, useEffect, useMemo } from "react";
 
 import Header from "../../component/customer/header";
@@ -9,28 +9,77 @@ import NutrientSection from "../../component/customer/nutrient-section";
 
 export default function ProductDetail() {
     const { product_id } = useParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams(); // 2. Lấy query params (ví dụ ?volume=180ml&pack=Lốc)
     const { addToCart } = useCart();
 
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-
+    
+    // State cho sản phẩm gợi ý
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
     const [selectedVolume, setSelectedVolume] = useState(null);
     const [selectedPack, setSelectedPack] = useState(null);
 
+    // Fetch thông tin sản phẩm chính
     useEffect(() => {
+        // Scroll lên đầu trang khi đổi sản phẩm
+        window.scrollTo(0, 0);
+
         fetch(`http://localhost:8000/products/${product_id}`)
             .then((res) => res.json())
             .then((data) => {
                 setProduct(data);
 
+                // --- 3. LOGIC CHỌN BIẾN THỂ DỰA TRÊN URL ---
                 if (data.variants && data.variants.length > 0) {
-                    const firstVariant = data.variants[0];
-                    setSelectedVolume(firstVariant.volume);
-                    setSelectedPack(firstVariant.packaging_type);
+                    const urlVolume = searchParams.get("volume");
+                    const urlPack = searchParams.get("pack");
+
+                    let targetVariant = null;
+
+                    // Ưu tiên 1: Tìm chính xác cả Volume và Pack
+                    if (urlVolume && urlPack) {
+                        targetVariant = data.variants.find(v => 
+                            v.volume === urlVolume && v.packaging_type === urlPack
+                        );
+                    }
+
+                    // Ưu tiên 2: Nếu chỉ có Volume trên URL, tìm cái đầu tiên khớp Volume
+                    if (!targetVariant && urlVolume) {
+                        targetVariant = data.variants.find(v => v.volume === urlVolume);
+                    }
+
+                    // Ưu tiên 3: Nếu không có URL hoặc tìm không thấy -> Lấy cái đầu tiên (Mặc định cũ)
+                    if (!targetVariant) {
+                        targetVariant = data.variants[0];
+                    }
+
+                    // Cập nhật State
+                    if (targetVariant) {
+                        setSelectedVolume(targetVariant.volume);
+                        setSelectedPack(targetVariant.packaging_type);
+                    }
                 }
             })
             .catch(err => console.error("Lỗi tải sản phẩm:", err));
+    }, [product_id, searchParams]); // Thêm searchParams vào dependency để cập nhật khi URL đổi
+
+    // Fetch danh sách sản phẩm để làm gợi ý (Lấy 3 sản phẩm khác sản phẩm hiện tại)
+    useEffect(() => {
+        fetch("http://localhost:8000/products")
+            .then((res) => res.json())
+            .then((data) => {
+                if (Array.isArray(data.data)) {
+                    // Lọc bỏ sản phẩm hiện tại và lấy 3 sản phẩm đầu tiên
+                    const others = data.data
+                        .filter(p => String(p.product_id) !== String(product_id))
+                        .slice(0, 3);
+                    setRelatedProducts(others);
+                }
+            })
+            .catch((err) => console.error("Lỗi tải sản phẩm gợi ý:", err));
     }, [product_id]);
 
     const uniqueVolumes = useMemo(() => {
@@ -68,8 +117,6 @@ export default function ProductDetail() {
     const handleAdd = async (e) => {
         e.stopPropagation();
 
-        console.log("Current Variant:", currentVariant);
-
         if (
             !currentVariant ||
             currentVariant.stock_quantity <= 0 ||
@@ -104,6 +151,12 @@ export default function ProductDetail() {
         setQuantity((prev) => Math.min(prev + 1, maxStock || 1));
     };
     const decrease = () => setQuantity((prev) => Math.max(1, prev - 1));
+
+    // Hàm chuyển hướng sang sản phẩm gợi ý
+    // [CẬP NHẬT]: Có thể truyền params rỗng hoặc giữ nguyên logic cũ
+    const handleRelatedClick = (id) => {
+        navigate(`/product-details/${id}`);
+    };
 
     if (!product) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
@@ -259,6 +312,46 @@ export default function ProductDetail() {
                                 product_id={product_id}
                                 currentVariant={currentVariant} />
                         </div>
+
+                        {/* === PHẦN SẢN PHẨM GỢI Ý === */}
+                        {relatedProducts.length > 0 && (
+                            <div className="mt-16">
+                                <div className="text-center mb-10">
+                                    <h2 className="text-[#1a3c7e] text-2xl md:text-3xl font-bold uppercase tracking-wide mb-2">
+                                        Có thể bạn sẽ thích
+                                    </h2>
+                                    <div className="w-16 h-1 bg-[#1a3c7e] mx-auto rounded-full"></div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    {relatedProducts.map((relProduct) => (
+                                        <div
+                                            key={relProduct.product_id}
+                                            onClick={() => handleRelatedClick(relProduct.product_id)}
+                                            className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                                        >
+                                            <div className="relative pt-[100%] overflow-hidden bg-white p-6">
+                                                <div
+                                                    className="absolute inset-0 m-6 bg-contain bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-110"
+                                                    style={{ backgroundImage: `url("${relProduct.image_url}")` }}
+                                                ></div>
+                                            </div>
+                                            <div className="p-5 text-center bg-gray-50/50">
+                                                <h3 className="text-[#1a3c7e] font-bold text-lg mb-2 line-clamp-2 min-h-[56px] group-hover:text-[#4096ff] transition-colors">
+                                                    {relProduct.product_name}
+                                                </h3>
+                                                <p className="text-gray-500 text-sm mb-4 line-clamp-2 h-10">
+                                                    {relProduct.description}
+                                                </p>
+                                                <button className="text-[#1a3c7e] text-sm font-bold hover:underline">
+                                                    Xem chi tiết &rarr;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </main>
 

@@ -37,7 +37,7 @@ export default function Registration() {
     setMessage("");
 
     const nameRegex = /^[^\d]+$/;
-    const phoneRegex = /^0\d{10}$/; // Lưu ý: Regex này check 11 số bắt đầu bằng 0 (theo code gốc của bạn)
+    const phoneRegex = /^0\d{9}$/; // Lưu ý: Regex này check 11 số bắt đầu bằng 0 (theo code gốc của bạn)
     const passwordRegex = /^.{6,}$/;
 
     // Validation

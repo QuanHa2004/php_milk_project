@@ -149,7 +149,7 @@ export default function Profile() {
                                         <div className="relative">
                                             <div className="w-24 h-24 rounded-full border-4 border-blue-50 overflow-hidden mb-4">
                                                 <img
-                                                    src={user.avatar_url || "https://via.placeholder.com/150"}
+                                                    src={user.avatar_url}
                                                     className="w-full h-full object-cover"
                                                     alt="Avatar"
                                                 />
@@ -185,10 +185,6 @@ export default function Profile() {
                                             Lịch sử mua hàng
                                         </button>
 
-                                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-red-500 hover:bg-red-50 transition-all duration-200 mt-4 border-t border-gray-100">
-                                            <span className="material-symbols-outlined">logout</span>
-                                            Đăng xuất
-                                        </button>
                                     </nav>
                                 </div>
                             </aside>

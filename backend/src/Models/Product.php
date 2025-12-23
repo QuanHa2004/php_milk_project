@@ -160,6 +160,149 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function filter($category_id, $brand_name, $volume = null)
+    {
+        $db = Connection::get();
+
+        // 1. Lấy thông tin cơ bản của Product và Variant (như cũ)
+        $sql = "
+            SELECT 
+                p.product_id,
+                p.product_name,
+                pv.variant_id,
+                pv.volume,
+                pv.packaging_type,
+                pv.price,
+                pv.stock_quantity, -- Tổng tồn kho của tất cả các lô
+                pv.brand_name,
+                p.category_id,
+                c.category_name,
+                p.image_url,
+                p.description
+            FROM product p
+            LEFT JOIN category c ON p.category_id = c.category_id
+            JOIN product_variant pv 
+                ON p.product_id = pv.product_id
+                AND pv.is_active = 1
+            WHERE p.is_deleted = 0
+        ";
+
+        $params = [];
+
+        if (!empty($category_id)) {
+            $sql .= " AND p.category_id = :category_id";
+            $params['category_id'] = $category_id;
+        }
+
+        if (!empty($brand_name)) {
+            $sql .= " AND pv.brand_name = :brand_name";
+            $params['brand_name'] = $brand_name;
+        }
+
+        if (!empty($volume)) {
+            $sql .= " AND pv.volume = :volume";
+            $params['volume'] = $volume;
+        }
+
+        $sql .= " ORDER BY p.product_id DESC, pv.volume ASC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Nếu không có kết quả nào thì trả về mảng rỗng ngay
+        if (empty($results)) {
+            return [];
+        }
+
+        // --- MỚI: Logic lấy Batch giống hàm find ---
+
+        // 2. Lấy danh sách variant_id từ kết quả tìm kiếm
+        $variantIds = array_unique(array_column($results, 'variant_id'));
+
+        // Tạo chuỗi placeholder (?,?,?) cho câu query IN
+        $placeholders = str_repeat('?,', count($variantIds) - 1) . '?';
+
+        // 3. Lấy các lô hàng còn tồn (quantity > 0) của các variant này
+        // Sắp xếp theo hạn sử dụng tăng dần (Hết hạn trước xuất trước)
+        $sqlBatch = "
+            SELECT batch_id, variant_id, quantity, expiration_date
+            FROM product_batch
+            WHERE variant_id IN ($placeholders) AND quantity > 0
+            ORDER BY expiration_date ASC, batch_id ASC
+        ";
+
+        $stmtBatch = $db->prepare($sqlBatch);
+        // array_values để đảm bảo index mảng bắt đầu từ 0 cho execute
+        $stmtBatch->execute(array_values($variantIds));
+        $allBatches = $stmtBatch->fetchAll(PDO::FETCH_ASSOC);
+
+        // 4. Chọn lô hàng tốt nhất (hạn gần nhất) cho mỗi variant
+        $bestBatches = [];
+        foreach ($allBatches as $batch) {
+            $vId = $batch['variant_id'];
+            // Vì đã ORDER BY expiration_date ASC, nên lô đầu tiên gặp là lô tốt nhất
+            if (!isset($bestBatches[$vId])) {
+                $bestBatches[$vId] = $batch;
+            }
+        }
+
+        // 5. Gộp thông tin batch vào kết quả trả về
+        foreach ($results as &$row) {
+            $vId = $row['variant_id'];
+
+            if (isset($bestBatches[$vId])) {
+                $b = $bestBatches[$vId];
+                $row['batch_id'] = $b['batch_id'];
+                $row['batch_quantity'] = $b['quantity']; // Số lượng chỉ của lô này
+                $row['batch_expiration'] = $b['expiration_date'];
+            } else {
+                // Trường hợp variant có tổng stock > 0 nhưng không tìm thấy batch cụ thể (lỗi dữ liệu)
+                // Hoặc variant hết hàng
+                $row['batch_id'] = null;
+                $row['batch_quantity'] = 0;
+                $row['batch_expiration'] = null;
+            }
+        }
+
+        return $results;
+    }
+
+    public static function getAllBrands()
+    {
+        $db = Connection::get();
+        // Lấy các brand_name duy nhất, loại bỏ giá trị NULL hoặc rỗng
+        $sql = "SELECT DISTINCT brand_name 
+            FROM product_variant 
+            WHERE brand_name IS NOT NULL 
+            AND brand_name != '' 
+            ORDER BY brand_name ASC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        // Trả về mảng dạng: [['brand_name' => 'Vinamilk'], ['brand_name' => 'TH True Milk'], ...]
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getAllVolumes()
+    {
+        $db = Connection::get();
+        // Lấy danh sách volume duy nhất, không lấy giá trị null hoặc rỗng
+        $sql = "SELECT DISTINCT volume 
+            FROM product_variant 
+            WHERE volume IS NOT NULL 
+            AND volume != '' 
+            ORDER BY volume ASC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        // Trả về: [['volume' => '110ml'], ['volume' => '180ml'], ...]
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     public static function find($product_id)
     {
         $db = Connection::get();
@@ -185,6 +328,7 @@ class Product
             SELECT 
                 v.variant_id, 
                 v.variant_name, 
+                v.brand_name,
                 v.volume, 
                 v.packaging_type, 
                 v.price, 
@@ -313,13 +457,13 @@ class Product
         $db = Connection::get();
 
         $stmt = $db->prepare("
-        SELECT batch_id, quantity
-        FROM product_batch
-        WHERE variant_id = :variant_id
-          AND quantity > 0
-        ORDER BY expiration_date ASC
-        FOR UPDATE
-    ");
+            SELECT batch_id, quantity
+            FROM product_batch
+            WHERE variant_id = :variant_id
+            AND quantity > 0
+            ORDER BY expiration_date ASC
+            FOR UPDATE
+        ");
         $stmt->execute(['variant_id' => $variant_id]);
         $batches = $stmt->fetchAll();
 
@@ -343,7 +487,7 @@ class Product
         }
 
         if ($remain > 0) {
-            return false; 
+            return false;
         }
 
         $db->prepare("

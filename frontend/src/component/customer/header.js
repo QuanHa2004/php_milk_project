@@ -86,7 +86,7 @@ export default function Header() {
             <div className="flex w-full items-center rounded-full bg-[#f4f7fc] border border-transparent group-focus-within:border-[#1a3c7e] group-focus-within:bg-white group-focus-within:shadow-md transition-all duration-300 h-10 overflow-hidden">
               <input
                 className="w-full bg-transparent border-none outline-none text-sm text-[#333] px-4 placeholder-gray-400"
-                placeholder="Tìm kiếm sản phẩm..."
+                placeholder="Tìm kiếm tên sản phẩm..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 onKeyDown={(e) => {

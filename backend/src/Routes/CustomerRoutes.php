@@ -18,8 +18,23 @@ if ($uri === "/products" && $method === "GET") {
     exit;
 }
 
+if ($uri === "/volumes" && $method === "GET") {
+    $product->getVolumes();
+    exit;
+}
+
+if ($uri === "/brands" && $method === "GET") {
+    $product->getBrands();
+    exit;
+}
+
 if (preg_match("#^/([0-9]+)/products$#", $uri, $matches) && $method === "GET") {
     $product->getByCategory($matches[1]);
+    exit;
+}
+
+if ($uri === "/products/filter" && $method === "POST") {
+    $product->filterProduct(json_decode(file_get_contents('php://input'), true));
     exit;
 }
 

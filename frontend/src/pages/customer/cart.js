@@ -77,11 +77,6 @@ export default function Cart() {
 
                 <main className="flex-grow pt-32 pb-20">
                     <div className="container mx-auto px-4 md:px-10 lg:px-20">
-                        <div className="flex items-center gap-2 mb-8">
-                            <span className="text-gray-500 cursor-pointer hover:text-[#1a3c7e]" onClick={() => navigate('/')}>Trang chủ</span>
-                            <span className="text-gray-400">/</span>
-                            <span className="text-[#1a3c7e] font-semibold">Giỏ hàng</span>
-                        </div>
 
                         <div className="mb-8">
                             <h1 className="text-[#1a3c7e] text-3xl font-bold uppercase tracking-wide">
