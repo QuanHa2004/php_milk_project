@@ -8,13 +8,15 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use Models\Cart;
+use Models\User;
+use Mailer;
 
 class AuthController
 {
-     /* ============================================
+    /* ============================================
          1. TẠO TOKEN (dùng cho login + social login)
      ============================================ */
-     public function generateToken($userId, $roleId, $email = null)
+    public function generateToken($userId, $roleId, $email = null)
     {
         $payload = [
             'sub'      => $userId,
@@ -28,10 +30,10 @@ class AuthController
     }
 
 
-     /* ============================================
+    /* ============================================
          2. AUTH TRUYỀN THỐNG (REGISTER + LOGIN)
      ============================================ */
-     public function register($data)
+    public function register($data)
     {
         $db = Connection::get();
 
@@ -154,22 +156,21 @@ class AuthController
     → Hỗ trợ lấy Authorization header trên mọi server
     ============================================
     */
-    private function getBearerToken() 
+    private function getBearerToken()
     {
         $headers = null;
 
         // Lấy từ $_SERVER
         if (isset($_SERVER['Authorization'])) {
             $headers = trim($_SERVER["Authorization"]);
-        }
-        else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        } else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
             $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
-        } 
+        }
         // Lấy từ Apache
         else if (function_exists('apache_request_headers')) {
             $requestHeaders = apache_request_headers();
             $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
-            
+
             if (isset($requestHeaders['Authorization'])) {
                 $headers = trim($requestHeaders['Authorization']);
             }
@@ -248,5 +249,89 @@ class AuthController
         } catch (\Exception $e) {
             Response::json(['error' => $e->getMessage()], 401);
         }
+    }
+
+    public function forgotPassword($data)
+    {
+        $email = $data['email'] ?? null;
+        if (!$email) {
+            Response::json(['error' => 'Vui lòng nhập email'], 400);
+            return;
+        }
+
+        $user = User::findByEmail($email);
+        if (!$user) {
+            Response::json(['error' => 'Email không tồn tại trong hệ thống'], 404);
+            return;
+        }
+
+        // Sinh OTP
+        $otp = rand(100000, 999999);
+        User::saveOtp($user['user_id'], $otp);
+
+        // Gửi email (Giả lập)
+        // Mailer::send($email, "Reset Password", "Code: $otp");
+
+        // Trong môi trường dev, trả về OTP để test luôn
+        Response::json(['message' => 'OTP đã gửi', 'dev_otp' => $otp]);
+    }
+
+    public function verifyOtp($data)
+    {
+        $email = $data['email'] ?? null;
+        $otp   = $data['otp'] ?? null;
+
+        if (!$email || !$otp) {
+            Response::json(['error' => 'Thiếu thông tin xác thực'], 400);
+            return;
+        }
+
+        $user = User::findByEmail($email);
+        if (!$user) {
+            Response::json(['error' => 'Người dùng không tồn tại'], 404);
+            return;
+        }
+
+        if ($user['reset_otp'] != $otp) {
+            Response::json(['error' => 'Mã OTP không chính xác'], 400);
+            return;
+        }
+
+        if (strtotime($user['reset_otp_expire']) < time()) {
+            Response::json(['error' => 'Mã OTP đã hết hạn'], 400);
+            return;
+        }
+
+        Response::json(['message' => 'OTP hợp lệ']);
+    }
+
+    public function resetPassword($data)
+    {
+        $email    = $data['email'] ?? null;
+        $otp      = $data['otp'] ?? null;
+        $password = $data['password'] ?? null;
+
+        if (!$email || !$otp || !$password) {
+            Response::json(['error' => 'Thiếu thông tin'], 400);
+            return;
+        }
+
+        $user = User::findByEmail($email);
+        if (!$user) {
+            Response::json(['error' => 'Lỗi người dùng'], 404);
+            return;
+        }
+
+        // Kiểm tra lại OTP lần cuối để bảo mật (tránh vượt qua bước verify)
+        if ($user['reset_otp'] != $otp || strtotime($user['reset_otp_expire']) < time()) {
+            Response::json(['error' => 'Phiên làm việc hết hạn, vui lòng thử lại'], 400);
+            return;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        User::updatePassword($user['user_id'], $hashedPassword);
+        User::clearOtp($user['user_id']);
+
+        Response::json(['message' => 'Đổi mật khẩu thành công']);
     }
 }

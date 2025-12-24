@@ -11,9 +11,15 @@ import AddProduct from '../pages/admin/product/add-product';
 import ProductManagement from '../pages/admin/product/product-management';
 import CreatePromotion from '../pages/admin/promotion/create-promotion';
 import PromotionManagement from '../pages/admin/promotion/promotion-management';
+import ReviewManagement from '../pages/admin/review/review-management';
 import AddSupplier from '../pages/admin/supplier/add-supplier';
 import SupplierManagement from '../pages/admin/supplier/supplier-management';
 import UserManagement from '../pages/admin/user/user-management';
+import ForgotPassword from '../pages/auth/forgot-password';
+import Login from '../pages/auth/login';
+import Registration from '../pages/auth/registration';
+import ResetPassword from '../pages/auth/reset-password';
+import VerifyOTP from '../pages/auth/verify-otp';
 import Cart from '../pages/customer/cart/cart';
 import Checkout from '../pages/customer/checkout/checkout';
 import CheckoutFailed from "../pages/customer/checkout/checkout-failed";
@@ -22,8 +28,6 @@ import Home from '../pages/customer/home/home';
 import ProductDetail from '../pages/customer/product-detail/product-detail';
 import Product from '../pages/customer/product-option/product';
 import Profile from '../pages/customer/user/profile';
-import Login from '../pages/login';
-import Registration from '../pages/registration';
 import ProtectedRoutes from './protected-routes';
 
 export default function AppRoutes() {
@@ -32,6 +36,9 @@ export default function AppRoutes() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/registration" element={<Registration />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-otp" element={<VerifyOTP />} />
 
       <Route element={<ProtectedRoutes />}>
         <Route path="/admin/dashboard" element={<Dashboard />} />
@@ -49,6 +56,7 @@ export default function AppRoutes() {
         <Route path="/admin/add-invoice" element={<AddInvoice />} />
         <Route path="/admin/add-manufacturer" element={<AddManufacturer />} />
         <Route path="/admin/add-supplier" element={<AddSupplier />} />
+        <Route path="/admin/review" element={<ReviewManagement />} />
       </Route>
 
       <Route path="/" element={<Home />} />

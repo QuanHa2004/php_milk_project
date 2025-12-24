@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Routes\\' => array($baseDir . '/src/Routes'),
+    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Models\\' => array($baseDir . '/src/Models'),
     'Helpers\\' => array($baseDir . '/src/Helpers'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),

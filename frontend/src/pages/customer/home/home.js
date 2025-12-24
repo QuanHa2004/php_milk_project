@@ -32,12 +32,8 @@ export default function Home() {
           <Header />
 
           <main className="flex-1">
-            {/* === HERO SECTION: ABOUT === */}
             <section className="w-full relative h-[500px] overflow-hidden">
-              {/* Giả lập background image bằng màu gradient nếu chưa có ảnh */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-blue-600">
-                {/* Placeholder cho ảnh nền */}
-                {/* <img src="/images/about-hero.jpg" alt="About Us" className="w-full h-full object-cover opacity-30 mix-blend-overlay" /> */}
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center text-center">
@@ -53,13 +49,11 @@ export default function Home() {
               </div>
             </section>
 
-            {/* === SECTION 1: CÂU CHUYỆN THƯƠNG HIỆU === */}
             <section className="py-20 bg-white">
               <div className="container mx-auto px-4 md:px-10 lg:px-20">
                 <div className="flex flex-col md:flex-row items-center gap-12">
                   <div className="w-full md:w-1/2">
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                      {/* Placeholder ảnh */}
                       <div className="aspect-[4/3] items-center justify-center text-gray-400">
                         <img src="/images/banner.jpg" alt="About Us" className="w-full h-full object-cover opacity-100" />
                       </div>
@@ -81,7 +75,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* === SECTION 2: GIÁ TRỊ CỐT LÕI === */}
             <section className="py-20 bg-[#f4f7fc]">
               <div className="container mx-auto px-4 md:px-10 lg:px-20">
                 <div className="text-center mb-16">
@@ -94,7 +87,6 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {/* Card 1 */}
                   <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 text-center group">
                     <div className="w-20 h-20 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                       <QualityIcon />
@@ -105,7 +97,6 @@ export default function Home() {
                     </p>
                   </div>
 
-                  {/* Card 2 */}
                   <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 text-center group">
                     <div className="w-20 h-20 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                       <NatureIcon />
@@ -116,7 +107,6 @@ export default function Home() {
                     </p>
                   </div>
 
-                  {/* Card 3 */}
                   <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 text-center group">
                     <div className="w-20 h-20 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                       <TechIcon />
@@ -130,7 +120,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* === SECTION 3: THỐNG KÊ (NUMBERS) === */}
             <section className="py-16 bg-[#1a3c7e] text-white">
               <div className="container mx-auto px-4 md:px-10 lg:px-20">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-blue-800/50">
@@ -154,7 +143,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* === SECTION 4: CTA === */}
             <section className="py-20 bg-white">
               <div className="container mx-auto px-4 text-center">
                 <h2 className="text-3xl font-bold text-[#1a3c7e] mb-6">Bạn đã sẵn sàng trải nghiệm?</h2>

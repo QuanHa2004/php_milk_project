@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom"; // 1. Thêm useSearchParams
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Footer from '../../../component/footer';
 import Header from '../../../component/header';
 import useCart from '../../../context/cart-context';
@@ -7,31 +7,31 @@ import NutrientSection from "./nutrient-section";
 import ReviewSection from "./review-section";
 
 export default function ProductDetail() {
+    // ================== 1. Hook từ React Router / Context ==================
     const { product_id } = useParams();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams(); // 2. Lấy query params (ví dụ ?volume=180ml&pack=Lốc)
+    const [searchParams] = useSearchParams(); // Lấy query params (?volume=180ml&pack=Lốc)
     const { addToCart } = useCart();
 
+    // ================== 2. State quản lý dữ liệu ==================
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    
-    // State cho sản phẩm gợi ý
-    const [relatedProducts, setRelatedProducts] = useState([]);
-
+    const [relatedProducts, setRelatedProducts] = useState([]); // sản phẩm gợi ý
     const [selectedVolume, setSelectedVolume] = useState(null);
     const [selectedPack, setSelectedPack] = useState(null);
 
+    // ================== 3. useEffect (fetch dữ liệu) ==================
+
     // Fetch thông tin sản phẩm chính
     useEffect(() => {
-        // Scroll lên đầu trang khi đổi sản phẩm
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0); // Scroll lên đầu trang khi đổi sản phẩm
 
         fetch(`http://localhost:8000/products/${product_id}`)
             .then((res) => res.json())
             .then((data) => {
                 setProduct(data);
 
-                // --- 3. LOGIC CHỌN BIẾN THỂ DỰA TRÊN URL ---
+                // Logic chọn biến thể dựa trên URL
                 if (data.variants && data.variants.length > 0) {
                     const urlVolume = searchParams.get("volume");
                     const urlPack = searchParams.get("pack");
@@ -40,22 +40,22 @@ export default function ProductDetail() {
 
                     // Ưu tiên 1: Tìm chính xác cả Volume và Pack
                     if (urlVolume && urlPack) {
-                        targetVariant = data.variants.find(v => 
-                            v.volume === urlVolume && v.packaging_type === urlPack
+                        targetVariant = data.variants.find(
+                            v => v.volume === urlVolume && v.packaging_type === urlPack
                         );
                     }
 
-                    // Ưu tiên 2: Nếu chỉ có Volume trên URL, tìm cái đầu tiên khớp Volume
+                    // Ưu tiên 2: Nếu chỉ có Volume
                     if (!targetVariant && urlVolume) {
                         targetVariant = data.variants.find(v => v.volume === urlVolume);
                     }
 
-                    // Ưu tiên 3: Nếu không có URL hoặc tìm không thấy -> Lấy cái đầu tiên (Mặc định cũ)
+                    // Ưu tiên 3: Nếu không có URL hoặc không tìm thấy → lấy cái đầu tiên
                     if (!targetVariant) {
                         targetVariant = data.variants[0];
                     }
 
-                    // Cập nhật State
+                    // Cập nhật state
                     if (targetVariant) {
                         setSelectedVolume(targetVariant.volume);
                         setSelectedPack(targetVariant.packaging_type);
@@ -63,15 +63,14 @@ export default function ProductDetail() {
                 }
             })
             .catch(err => console.error("Lỗi tải sản phẩm:", err));
-    }, [product_id, searchParams]); // Thêm searchParams vào dependency để cập nhật khi URL đổi
+    }, [product_id, searchParams]);
 
-    // Fetch danh sách sản phẩm để làm gợi ý (Lấy 3 sản phẩm khác sản phẩm hiện tại)
+    // Fetch danh sách sản phẩm gợi ý (3 sản phẩm khác sản phẩm hiện tại)
     useEffect(() => {
         fetch("http://localhost:8000/products")
             .then((res) => res.json())
             .then((data) => {
                 if (Array.isArray(data.data)) {
-                    // Lọc bỏ sản phẩm hiện tại và lấy 3 sản phẩm đầu tiên
                     const others = data.data
                         .filter(p => String(p.product_id) !== String(product_id))
                         .slice(0, 3);
@@ -81,6 +80,7 @@ export default function ProductDetail() {
             .catch((err) => console.error("Lỗi tải sản phẩm gợi ý:", err));
     }, [product_id]);
 
+    // ================== 4. useMemo (tính toán phụ thuộc) ==================
     const uniqueVolumes = useMemo(() => {
         if (!product?.variants) return [];
         return [...new Set(product.variants.map(v => v.volume))];
@@ -100,7 +100,7 @@ export default function ProductDetail() {
         );
     }, [product, selectedVolume, selectedPack]);
 
-
+    // ================== 5. Handlers (xử lý sự kiện) ==================
     const handleVolumeChange = (newVolume) => {
         setSelectedVolume(newVolume);
 
@@ -111,7 +111,6 @@ export default function ProductDetail() {
             setSelectedPack(variantsOfNewVolume[0].packaging_type);
         }
     };
-
 
     const handleAdd = async (e) => {
         e.stopPropagation();
@@ -149,13 +148,13 @@ export default function ProductDetail() {
     const increase = (maxStock) => {
         setQuantity((prev) => Math.min(prev + 1, maxStock || 1));
     };
+
     const decrease = () => setQuantity((prev) => Math.max(1, prev - 1));
 
-    // Hàm chuyển hướng sang sản phẩm gợi ý
-    // [CẬP NHẬT]: Có thể truyền params rỗng hoặc giữ nguyên logic cũ
     const handleRelatedClick = (id) => {
         navigate(`/product-details/${id}`);
     };
+
 
     if (!product) return <div className="flex justify-center items-center h-screen">Loading...</div>;
 

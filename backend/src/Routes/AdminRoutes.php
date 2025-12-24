@@ -1,5 +1,8 @@
 <?php
 
+// =========================
+// ADMIN GET ROUTES - THỐNG KÊ
+// =========================
 if ($uri === "/admin/total-revenue" && $method === "GET") {
     $orderAdmin->getMonthlyRevenue();
     exit;
@@ -10,12 +13,9 @@ if ($uri === "/admin/new-customer" && $method === "GET") {
     exit;
 }
 
-if ($uri === "/admin/orders" && $method === "GET") {
-    $orderAdmin->getOrderList();
-    exit;
-}
-
-
+// =========================
+// ADMIN GET ROUTES - QUẢN LÝ ĐƠN HÀNG & KHÁCH HÀNG
+// =========================
 if ($uri === "/admin/orders" && $method === "GET") {
     $orderAdmin->getOrderList();
     exit;
@@ -31,6 +31,9 @@ if ($uri === "/admin/reviews" && $method === "GET") {
     exit;
 }
 
+// =========================
+// ADMIN GET ROUTES - QUẢN LÝ SẢN PHẨM & DANH MỤC
+// =========================
 if ($uri === "/admin/categories" && $method === "GET") {
     $categoryAdmin->getCategoryList();
     exit;
@@ -51,6 +54,9 @@ if ($uri === "/admin/products" && $method === "GET") {
     exit;
 }
 
+// =========================
+// ADMIN GET ROUTES - KHUYẾN MÃI & HÓA ĐƠN
+// =========================
 if ($uri === "/admin/promotions" && $method === "GET") {
     $promotionAdmin->getPromotionList();
     exit;
@@ -61,6 +67,9 @@ if ($uri === "/admin/invoices" && $method === "GET") {
     exit;
 }
 
+// =========================
+// ADMIN PUT ROUTES - CẬP NHẬT TRẠNG THÁI
+// =========================
 if ($uri === "/admin/promotions/status" && $method === "PUT") {
     $promotionAdmin->updateStatus(json_decode(file_get_contents("php://input"), true));
     exit;
@@ -71,10 +80,8 @@ if ($uri === "/admin/users/status" && $method === "PUT") {
     exit;
 }
 
-
-
 // =========================
-// ADMIN POST ROUTES
+// ADMIN POST ROUTES - THÊM MỚI
 // =========================
 if ($uri === "/admin/categories/add" && $method === "POST") {
     $categoryAdmin->addCategory(json_decode(file_get_contents('php://input'), true));

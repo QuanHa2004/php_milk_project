@@ -9,13 +9,20 @@ use Exception;
 class ProductController
 {
 
-    public function index()
+    public function getProductList()
     {
-        $products = Product::all_1();
+        try {
+            $product = Product::all();
 
-        Response::json([
-            'data' => $products
-        ]);
+            Response::json([
+                'data' => $product
+            ], 200);
+        } catch (Exception $e) {
+            Response::json([
+                'message' => 'Không thể lấy danh sách sản phẩm',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getVolumes()
@@ -81,15 +88,12 @@ class ProductController
     public function filterProduct($data)
     {
         try {
-            // 1. Lấy dữ liệu JSON từ Client
-            $input = json_decode(file_get_contents('php://input'), true);
-
             // 2. Lấy các tham số (bao gồm cả volume)
-            $categoryId = isset($input['category_id']) ? $input['category_id'] : null;
-            $brandName = isset($input['brand_name']) ? $input['brand_name'] : null;
+            $categoryId = isset($data['category_id']) ? $data['category_id'] : null;
+            $brandName = isset($data['brand_name']) ? $data['brand_name'] : null;
 
             // --- QUAN TRỌNG: Lấy thêm volume ---
-            $volume = isset($input['volume']) ? $input['volume'] : null;
+            $volume = isset($data['volume']) ? $data['volume'] : null;
 
             // 3. Gọi Model và truyền ĐỦ 3 tham số
             // Lưu ý: Hàm Product::filter phải được định nghĩa nhận 3 tham số như bạn đã sửa ở Model

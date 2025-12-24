@@ -142,7 +142,7 @@ export default function Registration() {
                 <input
                   name="phone"
                   type="tel"
-                  placeholder="Nhập SĐT (11 số)"
+                  placeholder="Nhập SĐT (10 số)"
                   className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-[#333] placeholder-gray-400 focus:border-[#1a3c7e] focus:ring-1 focus:ring-[#1a3c7e] focus:outline-none transition-all"
                   value={formData.phone}
                   onChange={handleChange}

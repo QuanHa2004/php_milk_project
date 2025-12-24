@@ -57,7 +57,6 @@ class ReviewController
         }
     }
 
-
     public function getProductReviews($product_id, $variant_id)
     {
         try {

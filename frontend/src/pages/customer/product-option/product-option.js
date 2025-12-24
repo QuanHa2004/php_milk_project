@@ -56,7 +56,6 @@ export default function ProductOption() {
       .catch(err => console.error("Lỗi tải volume:", err));
   }, []);
 
-  // Filter Products Logic
   useEffect(() => {
     if (searchResult && !selectedBrand && !category_id && !selectedVolume) {
       setProducts(searchResult);
@@ -129,18 +128,14 @@ export default function ProductOption() {
     setSelectedVolume(selectedVolume === vol ? null : vol);
   };
 
-  // --- [ĐÃ SỬA] HÀM THÊM GIỎ HÀNG ---
   const handleAddToCart = async (e, productItem) => {
-    e.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài
+    e.stopPropagation(); 
 
-    // 1. Kiểm tra tồn kho tổng quát
     if (!productItem.stock_quantity || productItem.stock_quantity <= 0) {
       alert("Sản phẩm tạm hết hàng!");
       return;
     }
 
-    // 2. Kiểm tra Batch ID (Logic mới từ backend)
-    // Nếu API trả về null batch_id nghĩa là có lỗi dữ liệu hoặc hết hạn
     if (!productItem.batch_id || productItem.batch_quantity <= 0) {
       alert("Lô hàng hiện tại không khả dụng, vui lòng thử lại sau!");
       return;
@@ -156,8 +151,8 @@ export default function ProductOption() {
           packaging_type: productItem.packaging_type,
           price: productItem.price,
           image_url: productItem.image_url,
-          batch_id: productItem.batch_id, // QUAN TRỌNG: Gửi batch_id lên context
-          max_stock: productItem.batch_quantity // (Tùy chọn) Gửi số lượng max của lô để context validate
+          batch_id: productItem.batch_id, 
+          max_stock: productItem.batch_quantity 
         },
         1
       );
@@ -169,7 +164,6 @@ export default function ProductOption() {
 
   return (
     <>
-      {/* HEADER DANH MỤC */}
       <div className="fixed top-20 left-0 w-full z-40 bg-white shadow-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-16 space-x-2 md:space-x-8 overflow-x-auto no-scrollbar">
@@ -181,14 +175,11 @@ export default function ProductOption() {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div className="min-h-screen bg-[#f8f9fa] pt-12 px-4 md:px-10 lg:px-20 pb-8">
         <div className="flex flex-col md:flex-row gap-8">
 
-          {/* SIDEBAR FILTER */}
           <div className="w-full md:w-64 flex-shrink-0 space-y-6">
 
-            {/* 1. Danh mục */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100" onClick={() => setIsCategoryOpen(!isCategoryOpen)}>
                 <h3 className="font-bold text-[#1a3c7e]">Danh mục</h3>
@@ -212,7 +203,6 @@ export default function ProductOption() {
               )}
             </div>
 
-            {/* 2. Thương hiệu */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100" onClick={() => setIsBrandOpen(!isBrandOpen)}>
                 <h3 className="font-bold text-[#1a3c7e]">Thương hiệu</h3>
@@ -234,7 +224,6 @@ export default function ProductOption() {
               )}
             </div>
 
-            {/* 3. Dung tích */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100" onClick={() => setIsVolumeOpen(!isVolumeOpen)}>
                 <h3 className="font-bold text-[#1a3c7e]">Dung tích</h3>
@@ -257,7 +246,6 @@ export default function ProductOption() {
             </div>
           </div>
 
-          {/* PRODUCT LIST */}
           <div className="flex-1">
             {products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

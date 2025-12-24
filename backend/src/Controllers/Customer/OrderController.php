@@ -10,10 +10,14 @@ use Models\Cart;
 use Models\Order;
 use Models\Product;
 
+
 class OrderController
 {
     private $user_id;
 
+    // =========================
+    // AUTHENTICATION
+    // =========================
     private function authenticate()
     {
         $auth = new AuthController();
@@ -22,9 +26,13 @@ class OrderController
             $this->user_id = $payload->sub;
         } catch (\Exception $e) {
             Response::json(['error' => $e->getMessage()], 401);
+            exit;
         }
     }
 
+    // =========================
+    // CHECKOUT
+    // =========================
     public function checkout($data)
     {
         $this->authenticate();
@@ -38,14 +46,19 @@ class OrderController
 
         if (empty($data['payment_method'])) {
             Response::json(['error' => 'Thiếu phương thức thanh toán'], 400);
+            return;
         }
 
         if (!$full_name || !$phone || !$address) {
             Response::json(['error' => 'Vui lòng cung cấp đầy đủ số điện thoại, địa chỉ'], 400);
+            return;
         }
 
         $cart = Cart::getCartByUserId($this->user_id);
-        if (!$cart) Response::json(['error' => 'Giỏ hàng trống'], 400);
+        if (!$cart) {
+            Response::json(['error' => 'Giỏ hàng trống'], 400);
+            return;
+        }
 
         $cart_items = Cart::getCartItems($cart['cart_id']);
         $items_to_buy = array_filter($cart_items, fn($item) => $item['is_checked'] == 1);
@@ -58,7 +71,7 @@ class OrderController
         $db->beginTransaction();
 
         try {
-
+            // Tạo đơn hàng
             $order_id = Order::create([
                 'user_id'        => $this->user_id,
                 'full_name'      => $full_name,
@@ -70,12 +83,10 @@ class OrderController
                 'note'           => $data['note'] ?? ''
             ]);
 
+            // Thêm chi tiết đơn hàng
             foreach ($items_to_buy as $item) {
-
                 if (empty($item['batch_id'])) {
-                    throw new \Exception(
-                        "Cart item thiếu batch_id (variant {$item['variant_id']})"
-                    );
+                    throw new \Exception("Cart item thiếu batch_id (variant {$item['variant_id']})");
                 }
 
                 Order::addDetail([
@@ -86,25 +97,16 @@ class OrderController
                     'quantity'   => $item['quantity']
                 ]);
 
-                if (!Product::decreaseStock(
-                    $item['variant_id'],
-                    $item['quantity'],
-                    $item['batch_id']
-                )) {
-                    throw new \Exception(
-                        "Không đủ tồn kho cho sản phẩm {$item['variant_id']}"
-                    );
+                if (!Product::decreaseStock($item['variant_id'], $item['quantity'], $item['batch_id'])) {
+                    throw new \Exception("Không đủ tồn kho cho sản phẩm {$item['variant_id']}");
                 }
 
                 if ($data['payment_method'] === 'COD') {
-                    Cart::removeItem(
-                        $cart['cart_id'],
-                        $item['variant_id'],
-                        $item['batch_id']
-                    );
+                    Cart::removeItem($cart['cart_id'], $item['variant_id'], $item['batch_id']);
                 }
             }
 
+            // Thanh toán
             if ($data['payment_method'] === 'VNPAY') {
                 $db->commit();
 
@@ -120,6 +122,7 @@ class OrderController
                     'order_id'    => $order_id,
                     'payment_url' => $vnp_Url
                 ]);
+                return;
             }
 
             Order::addPaymentLog($order_id, 'COD', $total_amount, 'SUCCESS');
@@ -135,12 +138,16 @@ class OrderController
         }
     }
 
+    // =========================
+    // RETRY PAYMENT
+    // =========================
     public function retryPayment($data)
     {
         $this->authenticate();
 
         if (empty($data['order_id'])) {
             Response::json(['error' => 'Thiếu mã đơn hàng'], 400);
+            return;
         }
 
         $order_id = $data['order_id'];
@@ -153,20 +160,18 @@ class OrderController
 
             if (!$order || $order['user_id'] != $this->user_id) {
                 Response::json(['error' => 'Đơn hàng không tồn tại hoặc không hợp lệ'], 404);
+                return;
             }
 
             if (!in_array($order['status'], ['pending', 'cancelled'])) {
                 Response::json(['error' => 'Đơn hàng này không thể thanh toán lại'], 400);
+                return;
             }
 
             $orderDetails = Order::getDetails($order_id);
 
             foreach ($orderDetails as $item) {
-                if (!Product::decreaseStock(
-                    $item['variant_id'],
-                    $item['quantity'],
-                    $item['batch_id']
-                )) {
+                if (!Product::decreaseStock($item['variant_id'], $item['quantity'], $item['batch_id'])) {
                     throw new \Exception("Sản phẩm {$item['product_name']} hiện đã hết hàng.");
                 }
             }
@@ -195,6 +200,9 @@ class OrderController
         }
     }
 
+    // =========================
+    // ORDER HISTORY
+    // =========================
     public function orderHistory()
     {
         $this->authenticate();

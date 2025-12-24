@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+// ================== 1. Khởi tạo Context & Hook ==================
 const CartContext = createContext();
 
 export default function useCart() {
@@ -7,15 +8,11 @@ export default function useCart() {
 }
 
 export function CartProvider({ children }) {
-  // -----------------------------
-  // STATE QUẢN LÝ
-  // -----------------------------
+  // ================== 2. State quản lý ==================
   const [cartItems, setCartItems] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("access_token"));
 
-  // -----------------------------
-  // KHỞI TẠO & ĐỒNG BỘ
-  // -----------------------------
+  // ================== 3. Khởi tạo & đồng bộ dữ liệu (useEffect) ==================
   // Lấy giỏ hàng từ localStorage khi load trang
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
@@ -32,9 +29,7 @@ export function CartProvider({ children }) {
     }
   }, [token]);
 
-  // -----------------------------
-  // QUẢN LÝ TOKEN & PHIÊN
-  // -----------------------------
+  // ================== 4. Quản lý token & phiên đăng nhập ==================
   const updateToken = (newToken) => {
     setToken(newToken);
   };
@@ -47,9 +42,7 @@ export function CartProvider({ children }) {
     localStorage.removeItem("cart");
   };
 
-  // -----------------------------
-  // ĐỒNG BỘ DỮ LIỆU
-  // -----------------------------
+  // ================== 5. Đồng bộ dữ liệu với backend ==================
   const fetchCartItems = async () => {
     if (!token) return;
 
@@ -92,9 +85,7 @@ export function CartProvider({ children }) {
     localStorage.removeItem("cart");
   };
 
-  // -----------------------------
-  // THAO TÁC GIỎ HÀNG
-  // -----------------------------
+  // ================== 6. Thao tác giỏ hàng (CRUD) ==================
   const addToCart = async (product, quantity) => {
     // KHÁCH CHƯA LOGIN → LOCALSTORAGE
     if (!token) {
@@ -238,9 +229,7 @@ export function CartProvider({ children }) {
       updateQuantity(variant_id, batch_id, item.quantity - 1);
   };
 
-  // -----------------------------
-  // PROVIDER
-  // -----------------------------
+  // ================== 7. Provider xuất giá trị ==================
   return (
     <CartContext.Provider
       value={{

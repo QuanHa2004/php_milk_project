@@ -7,14 +7,15 @@ use PDO;
 
 class Order
 {
-
+    // =========================
+    // TẠO ĐƠN HÀNG & CHI TIẾT
+    // =========================
     public static function create($data)
     {
         $db = Connection::get();
 
         // Xử lý ngày giao hàng
         $delivery_date = $data['delivery_date'] ?? null;
-
         if (empty($delivery_date)) {
             $delivery_date = date('Y-m-d H:i:s', strtotime('+3 days'));
         } elseif (is_numeric($delivery_date)) {
@@ -36,7 +37,6 @@ class Order
                 )";
 
         $stmt = $db->prepare($sql);
-
         $stmt->execute([
             'user_id'          => $data['user_id'],
             'full_name'        => $data['full_name'],
@@ -56,23 +56,14 @@ class Order
     {
         $db = Connection::get();
 
-        // Tổng tiền cho từng dòng sản phẩm
         $total_amount = $item['price'] * $item['quantity'];
 
         $sql = "INSERT INTO order_detail (
-                order_id,
-                variant_id,
-                batch_id,
-                price,
-                quantity,
-                total_amount
+                order_id, variant_id, batch_id,
+                price, quantity, total_amount
             ) VALUES (
-                :order_id,
-                :variant_id,
-                :batch_id,
-                :price,
-                :quantity,
-                :total_amount
+                :order_id, :variant_id, :batch_id,
+                :price, :quantity, :total_amount
             )";
 
         $stmt = $db->prepare($sql);
@@ -88,6 +79,9 @@ class Order
         return $db->lastInsertId();
     }
 
+    // =========================
+    // THANH TOÁN
+    // =========================
     public static function addPaymentLog($order_id, $method, $amount, $status = 'SUCCESS', $extraData = [])
     {
         $db = Connection::get();
@@ -120,6 +114,9 @@ class Order
         ]);
     }
 
+    // =========================
+    // CẬP NHẬT TRẠNG THÁI
+    // =========================
     public static function updateStatus($order_id, $status, $is_paid = false)
     {
         $db = Connection::get();
@@ -137,6 +134,9 @@ class Order
         ]);
     }
 
+    // =========================
+    // TRUY VẤN ĐƠN HÀNG
+    // =========================
     public static function find($order_id)
     {
         $db = Connection::get();
@@ -172,6 +172,9 @@ class Order
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // =========================
+    // THỐNG KÊ
+    // =========================
     public static function totalRevenueAndOrders()
     {
         $db = Connection::get();

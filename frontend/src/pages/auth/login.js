@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useCart from "../context/cart-context"; // Đảm bảo đường dẫn import đúng với dự án của bạn
+import useCart from "../../context/cart-context"; // Đảm bảo đường dẫn import đúng với dự án của bạn
 
 export default function Login() {
   const navigate = useNavigate();
@@ -119,8 +119,6 @@ export default function Login() {
     checkSocialLogin();
   }, [searchParams, navigate, updateToken]);
 
-
-  // --- GIAO DIỆN (JSX) ---
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[#f4f7fc]">
       <div className="absolute inset-0 overflow-hidden">
@@ -150,10 +148,8 @@ export default function Login() {
           <p className="text-base text-gray-500">Đăng nhập để trải nghiệm mua sắm tốt nhất</p>
         </div>
 
-        {/* Form đã được gắn sự kiện onSubmit */}
         <form className="flex w-full flex-col gap-6" onSubmit={handleSubmit}>
 
-          {/* Input Email */}
           <div className="flex flex-col w-full group">
             <label className="pb-2 text-sm font-bold text-[#1a3c7e]">Email / Số điện thoại</label>
             <div className="relative flex w-full items-center">
@@ -162,7 +158,6 @@ export default function Login() {
                 name="email"
                 placeholder="Nhập email của bạn"
                 className="flex h-12 w-full rounded-xl border border-gray-200 bg-white pl-4 pr-12 text-base text-[#333] placeholder-gray-400 focus:border-[#1a3c7e] focus:ring-1 focus:ring-[#1a3c7e] focus:outline-none transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
-                // Tích hợp logic
                 value={formData.email}
                 onChange={handleChange}
                 disabled={loading}
@@ -173,22 +168,18 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Input Password */}
           <div className="flex flex-col w-full group">
             <label className="pb-2 text-sm font-bold text-[#1a3c7e]">Mật khẩu</label>
             <div className="relative flex w-full items-center">
               <input
-                // Xử lý type text/password dựa trên state showPassword
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Nhập mật khẩu"
                 className="flex h-12 w-full rounded-xl border border-gray-200 bg-white pl-4 pr-12 text-base text-[#333] placeholder-gray-400 focus:border-[#1a3c7e] focus:ring-1 focus:ring-[#1a3c7e] focus:outline-none transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
-                // Tích hợp logic
                 value={formData.password}
                 onChange={handleChange}
                 disabled={loading}
               />
-              {/* Nút ẩn hiện mật khẩu */}
               <div
                 className="absolute right-0 top-0 bottom-0 flex items-center justify-center px-4 text-gray-400 cursor-pointer hover:text-[#1a3c7e] transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
@@ -201,7 +192,8 @@ export default function Login() {
           </div>
 
           <div className="flex justify-end -mt-2">
-            <span className="text-sm font-semibold text-[#1a3c7e] hover:text-[#15326d] hover:underline cursor-pointer transition-colors">
+            <span onClick={()=>{navigate('/forgot-password')}} 
+            className="text-sm font-semibold text-[#1a3c7e] hover:text-[#15326d] hover:underline cursor-pointer transition-colors">
               Quên mật khẩu?
             </span>
           </div>
@@ -245,7 +237,7 @@ export default function Login() {
             Chưa có tài khoản?{" "}
             <span
               className="font-bold text-[#1a3c7e] hover:underline cursor-pointer transition-colors"
-              onClick={() => navigate('/registration')} // Thêm điều hướng đăng ký (giả định)
+              onClick={() => navigate('/registration')} 
             >
               Đăng ký ngay
             </span>

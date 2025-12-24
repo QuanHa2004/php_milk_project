@@ -12,23 +12,19 @@ export default function CartItem() {
     fetchCartItems,
   } = useCart();
 
-  console.log("Cart items:", cartItems);
-
   const token = localStorage.getItem("access_token");
   const [checkAll, setCheckAll] = useState(false);
 
-  // -- State Effects ----------------------------------------------------
-  // Update `checkAll` when cart items change
+  // Theo dõi cartItems: nếu tất cả sản phẩm đều được chọn thì checkAll = true
   useEffect(() => {
     setCheckAll(cartItems.length > 0 && cartItems.every(item => item.is_checked));
   }, [cartItems]);
 
-  // -- Cart update handlers ---------------------------------------------
-  // Update a single cart item's checked status (guest or API)
+  // Hàm cập nhật trạng thái chọn/bỏ chọn của một sản phẩm
   const updateItemStatus = async (variant_id, is_checked) => {
     try {
-      // Guest mode
       if (!token) {
+        // Nếu chưa đăng nhập → lưu thay đổi vào localStorage
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         cart = cart.map(item =>
@@ -42,6 +38,7 @@ export default function CartItem() {
         return;
       }
 
+      // Nếu đã đăng nhập → gọi API để cập nhật trạng thái trên server
       const res = await fetch(`http://localhost:8000/carts/${variant_id}/status`, {
         method: "PUT",
         headers: {
@@ -58,24 +55,29 @@ export default function CartItem() {
     } catch (err) {
       console.error(err);
       alert("Không thể cập nhật trạng thái sản phẩm!");
-      fetchCartItems();
+      fetchCartItems(); // tải lại giỏ hàng nếu lỗi
     }
   };
 
-  // Toggle select/deselect all cart items
+  // Hàm xử lý checkbox "chọn tất cả"
   const handleCheckboxAll = () => {
+    // Nếu tất cả đã chọn → bỏ chọn hết, ngược lại → chọn hết
     const newIsChecked = !cartItems.every(item => item.is_checked);
 
+    // Cập nhật state
     const updated = cartItems.map(item => ({ ...item, is_checked: newIsChecked }));
     setCartItems(updated);
 
+    // Cập nhật trạng thái từng sản phẩm (localStorage hoặc server)
     updated.forEach(item => updateItemStatus(item.variant_id, newIsChecked));
   };
 
-  // Toggle select/deselect a single cart item
+  // Hàm xử lý checkbox của từng sản phẩm
   const handleCheckboxChange = (variant_id, is_checked) => {
+    // Đảo trạng thái hiện tại (true ↔ false)
     const newIsChecked = !is_checked;
 
+    // Cập nhật state cho sản phẩm đó
     setCartItems(prev =>
       prev.map(item =>
         item.variant_id === variant_id
@@ -84,8 +86,10 @@ export default function CartItem() {
       )
     );
 
+    // Cập nhật trạng thái trên localStorage hoặc server
     updateItemStatus(variant_id, newIsChecked);
   };
+
 
   return (
     <>
@@ -110,7 +114,6 @@ export default function CartItem() {
             key={index}
             className="group grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-4 md:px-6 md:py-6 border-b border-gray-100 last:border-0 hover:bg-blue-50/30 transition-colors duration-200"
           >
-            {/* Checkbox Desktop */}
             <div className="hidden md:flex col-span-1 justify-center">
               <input
                 type="checkbox"
@@ -120,9 +123,7 @@ export default function CartItem() {
               />
             </div>
 
-            {/* Cột thông tin sản phẩm (Hình ảnh + Tên) */}
             <div className="col-span-1 md:col-span-5 flex items-start gap-4">
-              {/* Checkbox Mobile */}
               <div className="md:hidden flex items-center pr-2 pt-8">
                 <input
                   type="checkbox"
@@ -132,14 +133,12 @@ export default function CartItem() {
                 />
               </div>
 
-              {/* KHỐI HÌNH ẢNH + NÚT XÓA (MỚI) */}
               <div className="flex flex-col items-center gap-2 shrink-0">
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 bg-center bg-no-repeat bg-contain bg-white border border-gray-100 rounded-lg"
                   style={{ backgroundImage: `url("${product.image_url}")` }}
                 />
 
-                {/* Nút xóa nằm dưới hình ảnh */}
                 <button
                   onClick={() => removeFromCart(product.variant_id, product.batch_id)}
                   className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-red-600 transition-colors py-1 px-2 rounded hover:bg-red-50"
@@ -152,7 +151,6 @@ export default function CartItem() {
                 </button>
               </div>
 
-              {/* Thông tin tên và quy cách */}
               <div className="flex flex-col gap-1 pt-1">
                 <p className="text-[#333] font-bold text-base line-clamp-2 hover:text-[#1a3c7e] transition-colors cursor-pointer">
                   {product.product_name}
@@ -175,7 +173,6 @@ export default function CartItem() {
               </div>
             </div>
 
-            {/* Đơn giá */}
             <div className="col-span-1 md:col-span-2 text-center">
               <span className="md:hidden text-gray-500 text-sm mr-2">Đơn giá:</span>
               <span className="text-[#333] font-medium">
@@ -183,7 +180,6 @@ export default function CartItem() {
               </span>
             </div>
 
-            {/* Số lượng */}
             <div className="col-span-1 md:col-span-2 flex justify-center">
               <div className="flex items-center border border-gray-300 rounded-lg h-9 bg-white">
                 <button
@@ -208,7 +204,6 @@ export default function CartItem() {
               </div>
             </div>
 
-            {/* Thành tiền */}
             <div className="col-span-1 md:col-span-2 flex items-center justify-between md:justify-end">
               <span className="md:hidden text-gray-500 text-sm">Thành tiền:</span>
               <div className="flex items-center gap-4">

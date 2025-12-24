@@ -36,7 +36,6 @@ export default function Voucher() {
         fetchData();
     }, []);
 
-    console.log(rows);
     if (isLoading) {
         return <p className="text-sm text-gray-500">Đang tải voucher...</p>;
     }

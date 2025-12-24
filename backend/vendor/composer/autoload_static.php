@@ -11,6 +11,10 @@ class ComposerStaticInit86257b6a00b389e668af5613b5eeba63
         array (
             'Routes\\' => 7,
         ),
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
         'M' => 
         array (
             'Models\\' => 7,
@@ -37,6 +41,10 @@ class ComposerStaticInit86257b6a00b389e668af5613b5eeba63
         'Routes\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/Routes',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'Models\\' => 
         array (

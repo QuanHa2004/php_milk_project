@@ -8,6 +8,9 @@ use Exception;
 
 class Promotion
 {
+    // =========================
+    // TẠO & LẤY DANH SÁCH
+    // =========================
     public static function create($data)
     {
         $db = Connection::get();
@@ -46,6 +49,9 @@ class Promotion
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // =========================
+    // TRUY VẤN PROMOTION THEO NGƯỜI DÙNG
+    // =========================
     public static function userPromotion($user_id)
     {
         $db = Connection::get();
@@ -62,10 +68,7 @@ class Promotion
             ORDER BY p.end_date ASC
         ");
 
-        $stmt->execute([
-            'user_id' => $user_id
-        ]);
-
+        $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -88,6 +91,7 @@ class Promotion
         $promo = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$promo) return false;
 
+        // Kiểm tra xem user đã dùng chưa
         $stmt = $db->prepare("
             SELECT 1 FROM user_promotion
             WHERE user_id = ? AND promo_id = ?
@@ -99,7 +103,9 @@ class Promotion
         return $promo;
     }
 
-
+    // =========================
+    // TÍNH TOÁN GIẢM GIÁ
+    // =========================
     public static function calculateDiscount($promo, $order_total)
     {
         if ($promo['discount_type'] === 'percent') {
@@ -110,6 +116,9 @@ class Promotion
         return min($promo['discount_value'], $order_total);
     }
 
+    // =========================
+    // CẬP NHẬT TRẠNG THÁI & SỬ DỤNG
+    // =========================
     public static function increaseUsage($promo_id)
     {
         $db = Connection::get();
@@ -135,13 +144,11 @@ class Promotion
     {
         $db = Connection::get();
 
-        $sql = "
+        $stmt = $db->prepare("
             UPDATE promotion
             SET is_active = :is_active
             WHERE promo_id = :promo_id
-        ";
-
-        $stmt = $db->prepare($sql);
+        ");
         $stmt->execute([
             'promo_id' => $promo_id,
             'is_active' => $is_active

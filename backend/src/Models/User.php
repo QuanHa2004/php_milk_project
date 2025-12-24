@@ -7,40 +7,9 @@ use PDO;
 
 class User
 {
-    public static function updateStatus($userId, $status)
-    {
-        $db = Connection::get();
-        $stmt = $db->prepare("
-            UPDATE user 
-            SET is_deleted = :is_deleted 
-            WHERE user_id = :user_id
-        ");
-
-        $stmt->execute([
-            ':is_deleted' => $status,
-            ':user_id' => $userId
-        ]);
-
-        return $stmt->rowCount() > 0;
-    }
-
-
-    public static function findById($userId)
-    {
-        $db = Connection::get();
-        $stmt = $db->prepare("SELECT * FROM user WHERE user_id = :id");
-        $stmt->execute([':id' => $userId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public static function findByEmail($email)
-    {
-        $db = Connection::get();
-        $stmt = $db->prepare("SELECT * FROM user WHERE email = :email LIMIT 1");
-        $stmt->execute(['email' => $email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
+    // =========================
+    // CRUD CƠ BẢN
+    // =========================
     public static function create($full_name, $email, $password_hash)
     {
         $db = Connection::get();
@@ -60,10 +29,35 @@ class User
         return $db->lastInsertId();
     }
 
+    public static function findById($userId)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("SELECT * FROM user WHERE user_id = :id");
+        $stmt->execute([':id' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function findByEmail($email)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("SELECT * FROM user WHERE email = :email LIMIT 1");
+        $stmt->execute(['email' => $email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function all()
+    {
+        $db = Connection::get();
+        $stmt = $db->query("SELECT * FROM user");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // =========================
+    // GOOGLE AUTH
+    // =========================
     public static function updateGoogleInfo($user_id, $google_id, $avatar_url)
     {
         $db = Connection::get();
-
         $sql = "UPDATE user 
                 SET google_id = :google_id,
                     avatar_url = :avatar_url
@@ -97,6 +91,9 @@ class User
         return $db->lastInsertId();
     }
 
+    // =========================
+    // CẬP NHẬT THÔNG TIN NGƯỜI DÙNG
+    // =========================
     public static function updateUser($user_id, $data)
     {
         $db = Connection::get();
@@ -125,13 +122,68 @@ class User
         return $stmt->rowCount();
     }
 
-    public static function all()
+    public static function updateStatus($userId, $status)
     {
         $db = Connection::get();
-        $stmt = $db->query("SELECT * FROM user");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare("
+            UPDATE user 
+            SET is_deleted = :is_deleted 
+            WHERE user_id = :user_id
+        ");
+
+        $stmt->execute([
+            ':is_deleted' => $status,
+            ':user_id' => $userId
+        ]);
+
+        return $stmt->rowCount() > 0;
     }
 
+    // =========================
+    // OTP & PASSWORD RESET
+    // =========================
+    public static function saveOtp($user_id, $otp)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("
+            UPDATE user 
+            SET reset_otp = :otp, reset_otp_expire = DATE_ADD(NOW(), INTERVAL 5 MINUTE)
+            WHERE user_id = :user_id
+        ");
+        return $stmt->execute([
+            'otp' => $otp,
+            'user_id' => $user_id
+        ]);
+    }
+
+    public static function clearOtp($user_id)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("
+            UPDATE user 
+            SET reset_otp = NULL, reset_otp_expire = NULL
+            WHERE user_id = :user_id
+        ");
+        return $stmt->execute(['user_id' => $user_id]);
+    }
+
+    public static function updatePassword($user_id, $hashedPassword)
+    {
+        $db = Connection::get();
+        $stmt = $db->prepare("
+            UPDATE user 
+            SET password_hash = :password, updated_at = NOW() 
+            WHERE user_id = :user_id
+        ");
+        return $stmt->execute([
+            'password' => $hashedPassword,
+            'user_id' => $user_id
+        ]);
+    }
+
+    // =========================
+    // TRUY VẤN DANH SÁCH
+    // =========================
     public static function newUsers()
     {
         $db = Connection::get();

@@ -1,20 +1,26 @@
 <?php
 
-/* USER */
+// =========================
+// USER
+// =========================
 if ($uri === "/users/update" && $method === "POST") {
     $user->updateUser(json_decode(file_get_contents('php://input'), true));
     exit;
 }
 
-/* CATEGORY */
+// =========================
+// CATEGORY
+// =========================
 if ($uri === "/categories" && $method === "GET") {
     $category->getCategoryList();
     exit;
 }
 
-/* PRODUCT */
+// =========================
+// PRODUCT
+// =========================
 if ($uri === "/products" && $method === "GET") {
-    $product->index();
+    $product->getProductList();
     exit;
 }
 
@@ -48,7 +54,9 @@ if (preg_match("#^/products/search/(.*)$#", $uri, $matches) && $method === "GET"
     exit;
 }
 
-/* CART */
+// =========================
+// CART
+// =========================
 if ($uri === "/carts/add" && $method === "POST") {
     $cart->add(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -74,7 +82,9 @@ if ($uri === "/carts/current_user" && $method === "GET") {
     exit;
 }
 
-/* ORDER */
+// =========================
+// ORDER
+// =========================
 if ($uri === "/orders/checkout" && $method === "POST") {
     $order->checkout(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -90,7 +100,9 @@ if ($uri === "/orders/history" && $method === "GET") {
     exit;
 }
 
-/* PAYMENT */
+// =========================
+// PAYMENT
+// =========================
 if ($uri === "/checkout/process-vnpay" && $method === "POST") {
     $payment->createPaymentUrl(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -101,7 +113,9 @@ if ($uri === "/payment/vnpay_return" && $method === "GET") {
     exit;
 }
 
-/* SOCIAL AUTH */
+// =========================
+// SOCIAL AUTH
+// =========================
 if ($uri === "/auth/google" && $method === "GET") {
     $socialAuth->redirectToGoogle();
     exit;
@@ -112,7 +126,9 @@ if ($uri === "/auth/google/callback" && $method === "GET") {
     exit;
 }
 
-/* REVIEW */
+// =========================
+// REVIEW
+// =========================
 if ($uri === "/reviews/add" && $method === "POST") {
     $review->addReview(json_decode(file_get_contents('php://input'), true));
     exit;
@@ -123,6 +139,9 @@ if (preg_match('#^/reviews/(\d+)/(\d+)$#', $uri, $matches) && $method === "GET")
     exit;
 }
 
+// =========================
+// PROMOTION
+// =========================
 if ($uri === "/promotions" && $method === "GET") {
     $promotion->getPromotionList();
     exit;

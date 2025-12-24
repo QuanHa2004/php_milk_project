@@ -9,34 +9,24 @@ import Voucher from './voucher';
 export default function Checkout() {
     const navigate = useNavigate();
     const { fetchCartItems } = useCart();
-    
-    // --- STATE ---
-    
-    // State chọn phương thức thanh toán
+    const [formErrors, setFormErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
     const [formData, setFormData] = useState({
         paymentMethod: 'COD'
     });
 
-    // State thông tin khách hàng (Form điền)
     const [customerInfo, setCustomerInfo] = useState({
         fullName: '',
         phone: '',
         address: ''
     });
 
-    // State xử lý lỗi và loading
-    const [formErrors, setFormErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    // --- EFFECTS ---
-
     // Gọi API lấy thông tin người dùng ngay khi vào trang
     useEffect(() => {
         fetchUser();
     }, []);
-
-    // --- API CALLS ---
 
     const fetchUser = async () => {
         const token = localStorage.getItem("access_token");
@@ -57,10 +47,9 @@ export default function Checkout() {
             }
 
             const data = await res.json();
-            
-            // [QUAN TRỌNG] Map dữ liệu từ API (snake_case) sang State (camelCase)
+
             setCustomerInfo({
-                fullName: data.full_name || '', // full_name từ API -> fullName của State
+                fullName: data.full_name || '', 
                 phone: data.phone || '',
                 address: data.address || ''
             });
@@ -70,13 +59,11 @@ export default function Checkout() {
         }
     };
 
-    // --- HANDLERS ---
-
     // Xử lý khi người dùng gõ vào ô input
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setCustomerInfo(prev => ({ ...prev, [name]: value }));
-        
+
         // Xóa lỗi khi người dùng bắt đầu sửa
         if (formErrors[name]) {
             setFormErrors(prev => ({ ...prev, [name]: '' }));
@@ -118,7 +105,6 @@ export default function Checkout() {
 
     // Xử lý nút Đặt hàng
     const handleCheckout = async () => {
-        // 1. Validate Client-side
         if (!validateForm()) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
@@ -135,14 +121,8 @@ export default function Checkout() {
                 return;
             }
 
-            // Payload chỉ gửi phương thức thanh toán (Backend tự lấy user từ token)
-            // Nếu backend cần cả địa chỉ/sđt mới từ form này thì bạn cần thêm vào payload
             const payload = {
                 payment_method: formData.paymentMethod,
-                // Nếu backend cần cập nhật địa chỉ từ đơn hàng này, bỏ comment dòng dưới:
-                // shipping_address: customerInfo.address,
-                // shipping_phone: customerInfo.phone,
-                // receiver_name: customerInfo.fullName
             };
 
             const response = await fetch('http://localhost:8000/orders/checkout', {
@@ -208,10 +188,8 @@ export default function Checkout() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-                            {/* CỘT TRÁI: THÔNG TIN & PHƯƠNG THỨC THANH TOÁN */}
                             <div className="lg:col-span-2 space-y-6">
-                                
-                                {/* 1. FORM THÔNG TIN GIAO HÀNG */}
+
                                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
                                     <h2 className="text-[#1a3c7e] text-xl font-bold flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
                                         <span className="material-symbols-outlined text-2xl">person_pin_circle</span>
@@ -219,11 +197,10 @@ export default function Checkout() {
                                     </h2>
 
                                     <div className="space-y-4">
-                                        {/* Họ và tên */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên người nhận <span className="text-red-500">*</span></label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 name="fullName"
                                                 value={customerInfo.fullName}
                                                 onChange={handleInputChange}
@@ -233,11 +210,10 @@ export default function Checkout() {
                                             {formErrors.fullName && <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>}
                                         </div>
 
-                                        {/* Số điện thoại */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại <span className="text-red-500">*</span></label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 name="phone"
                                                 value={customerInfo.phone}
                                                 onChange={handleInputChange}
@@ -247,11 +223,10 @@ export default function Checkout() {
                                             {formErrors.phone && <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>}
                                         </div>
 
-                                        {/* Địa chỉ */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ nhận hàng <span className="text-red-500">*</span></label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 name="address"
                                                 value={customerInfo.address}
                                                 onChange={handleInputChange}
@@ -263,7 +238,6 @@ export default function Checkout() {
                                     </div>
                                 </div>
 
-                                {/* 2. PHƯƠNG THỨC THANH TOÁN */}
                                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
                                     <h2 className="text-[#1a3c7e] text-xl font-bold flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
                                         <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
@@ -271,12 +245,11 @@ export default function Checkout() {
                                     </h2>
 
                                     <div className="space-y-4">
-                                        {/* VNPAY */}
                                         <label
                                             className={`relative flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
                                             ${formData.paymentMethod === 'VNPAY'
-                                                ? 'border-[#1a3c7e] bg-blue-50/30'
-                                                : 'border-gray-100 hover:border-blue-200'}`}
+                                                    ? 'border-[#1a3c7e] bg-blue-50/30'
+                                                    : 'border-gray-100 hover:border-blue-200'}`}
                                             onClick={() => handlePaymentChange('VNPAY')}
                                         >
                                             <div className="flex items-center justify-center">
@@ -301,12 +274,11 @@ export default function Checkout() {
                                             </div>
                                         </label>
 
-                                        {/* COD */}
                                         <label
                                             className={`relative flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
                                             ${formData.paymentMethod === 'COD'
-                                                ? 'border-[#1a3c7e] bg-blue-50/30'
-                                                : 'border-gray-100 hover:border-blue-200'}`}
+                                                    ? 'border-[#1a3c7e] bg-blue-50/30'
+                                                    : 'border-gray-100 hover:border-blue-200'}`}
                                             onClick={() => handlePaymentChange('COD')}
                                         >
                                             <div className="flex items-center justify-center">
@@ -329,16 +301,14 @@ export default function Checkout() {
                                     </div>
                                 </div>
 
-                                {/* 3. VOUCHER */}
-                                <div className="mt-8 bg-white rounded-xl p-6 border border-[#dbe2e6]">
+                                {/* <div className="mt-8 bg-white rounded-xl p-6 border border-[#dbe2e6]">
                                     <h2 className="text-[#111618] text-[22px] font-bold leading-tight tracking-[-0.015em] mb-6">
                                         Những voucher đang có
                                     </h2>
                                     <Voucher />
-                                </div>
+                                </div> */}
                             </div>
 
-                            {/* CỘT PHẢI: TÓM TẮT ĐƠN HÀNG */}
                             <div className="lg:col-span-1">
                                 <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] sticky top-32 p-6 border border-gray-100">
                                     <h3 className="text-[#1a3c7e] text-xl font-bold uppercase border-b-2 border-[#1a3c7e] pb-3 mb-6 inline-block">
@@ -361,9 +331,9 @@ export default function Checkout() {
                                         disabled={loading}
                                         className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transition-all duration-300 transform hover:-translate-y-1
                                         ${loading
-                                            ? 'bg-gray-300 text-white cursor-not-allowed shadow-none'
-                                            : 'bg-gradient-to-r from-[#1a3c7e] to-[#2b55a3] text-white hover:shadow-blue-200'
-                                        }`}
+                                                ? 'bg-gray-300 text-white cursor-not-allowed shadow-none'
+                                                : 'bg-gradient-to-r from-[#1a3c7e] to-[#2b55a3] text-white hover:shadow-blue-200'
+                                            }`}
                                     >
                                         {loading ? (
                                             <span className="flex items-center justify-center gap-2">

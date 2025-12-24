@@ -7,7 +7,9 @@ use PDO;
 
 class Cart
 {
-
+    // =========================
+    // CART KHỞI TẠO & TRUY VẤN
+    // =========================
     public static function getCartByUserId($user_id)
     {
         $db = Connection::get();
@@ -63,14 +65,20 @@ class Cart
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // =========================
+    // CART ITEM - THÊM, XÓA, CẬP NHẬT
+    // =========================
     public static function addItem($cart_id, $variant_id, $quantity, $batch_id = null, $is_checked = 0)
     {
         $db = Connection::get();
 
+        // Kiểm tra xem item đã tồn tại chưa
         $stmt = $db->prepare("
-        SELECT * FROM cart_item 
-        WHERE cart_id = :cart_id AND variant_id = :variant_id AND (batch_id = :batch_id OR (:batch_id IS NULL AND batch_id IS NULL))
-    ");
+            SELECT * FROM cart_item 
+            WHERE cart_id = :cart_id 
+              AND variant_id = :variant_id 
+              AND (batch_id = :batch_id OR (:batch_id IS NULL AND batch_id IS NULL))
+        ");
         $stmt->execute([
             'cart_id' => $cart_id,
             'variant_id' => $variant_id,
@@ -81,10 +89,12 @@ class Cart
         if ($item) {
             // Nếu đã tồn tại → tăng số lượng
             $stmt = $db->prepare("
-            UPDATE cart_item 
-            SET quantity = quantity + :qty 
-            WHERE cart_id = :cart_id AND variant_id = :variant_id AND (batch_id = :batch_id OR (:batch_id IS NULL AND batch_id IS NULL))
-        ");
+                UPDATE cart_item 
+                SET quantity = quantity + :qty 
+                WHERE cart_id = :cart_id 
+                  AND variant_id = :variant_id 
+                  AND (batch_id = :batch_id OR (:batch_id IS NULL AND batch_id IS NULL))
+            ");
             $stmt->execute([
                 'qty' => $quantity,
                 'cart_id' => $cart_id,
@@ -94,9 +104,9 @@ class Cart
         } else {
             // Chưa tồn tại → tạo mới
             $stmt = $db->prepare("
-            INSERT INTO cart_item (cart_id, variant_id, batch_id, quantity, is_checked)
-            VALUES (:cart_id, :variant_id, :batch_id, :quantity, :is_checked)
-        ");
+                INSERT INTO cart_item (cart_id, variant_id, batch_id, quantity, is_checked)
+                VALUES (:cart_id, :variant_id, :batch_id, :quantity, :is_checked)
+            ");
             $stmt->execute([
                 'cart_id' => $cart_id,
                 'variant_id' => $variant_id,
@@ -107,18 +117,16 @@ class Cart
         }
     }
 
-
-    // Xóa sản phẩm khỏi giỏ
     public static function removeItem($cart_id, $variant_id, $batch_id)
     {
         $db = Connection::get();
 
         $stmt = $db->prepare("
-        DELETE FROM cart_item
-        WHERE cart_id = :cart_id
-          AND variant_id = :variant_id
-          AND batch_id = :batch_id
-    ");
+            DELETE FROM cart_item
+            WHERE cart_id = :cart_id
+              AND variant_id = :variant_id
+              AND batch_id = :batch_id
+        ");
 
         $stmt->execute([
             'cart_id'   => $cart_id,
@@ -129,18 +137,16 @@ class Cart
         return $stmt->rowCount();
     }
 
-
-    // Cập nhật số lượng sản phẩm
     public static function updateItemQuantity($cart_id, $variant_id, $batch_id, $quantity)
     {
         $db = Connection::get();
         $stmt = $db->prepare("
-        UPDATE cart_item
-        SET quantity = :quantity
-        WHERE cart_id = :cart_id
-          AND variant_id = :variant_id
-          AND batch_id = :batch_id
-    ");
+            UPDATE cart_item
+            SET quantity = :quantity
+            WHERE cart_id = :cart_id
+              AND variant_id = :variant_id
+              AND batch_id = :batch_id
+        ");
         $stmt->execute([
             'quantity' => $quantity,
             'cart_id' => $cart_id,
@@ -153,10 +159,10 @@ class Cart
     {
         $db = Connection::get();
         $stmt = $db->prepare("
-        UPDATE cart_item 
-        SET is_checked = :is_checked 
-        WHERE cart_id = :cart_id AND variant_id = :variant_id
-    ");
+            UPDATE cart_item 
+            SET is_checked = :is_checked 
+            WHERE cart_id = :cart_id AND variant_id = :variant_id
+        ");
         $stmt->execute([
             'is_checked' => $is_checked ? 1 : 0,
             'cart_id' => $cart_id,
@@ -166,6 +172,9 @@ class Cart
         return $stmt->rowCount();
     }
 
+    // =========================
+    // CART CLEAR
+    // =========================
     public static function clearCart($cart_id)
     {
         $db = Connection::get();
