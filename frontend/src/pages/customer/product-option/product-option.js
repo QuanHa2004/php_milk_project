@@ -87,6 +87,9 @@ export default function ProductOption() {
     fetchFilteredProducts();
   }, [category_id, selectedBrand, selectedVolume, searchResult]);
 
+  console.log(products);
+
+
   // --- HANDLERS ---
   const handleClick = (product) => {
     // 1. Tạo đường dẫn gốc

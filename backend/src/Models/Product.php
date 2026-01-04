@@ -220,28 +220,75 @@ class Product
         $search_name = trim($search_name);
 
         $sql = "
-            SELECT 
-                p.product_id,
-                p.product_name,
-                p.category_id,
-                p.image_url,
-                p.description,
-                p.is_hot,
-                MIN(v.price) AS min_price,
-                SUM(v.stock_quantity) AS total_quantity
-            FROM product p
-            LEFT JOIN product_variant v ON p.product_id = v.product_id
-            WHERE p.product_name LIKE :search_name
-            AND p.is_deleted = 0
-            GROUP BY p.product_id
-            ORDER BY p.product_id DESC
-        ";
+        SELECT 
+            p.product_id,
+            p.product_name,
+            pv.variant_id,
+            pv.volume,
+            pv.packaging_type,
+            pv.price,
+            pv.stock_quantity,
+            pv.brand_name,
+            p.category_id,
+            c.category_name,
+            p.image_url,
+            p.description
+        FROM product p
+        LEFT JOIN category c ON p.category_id = c.category_id
+        JOIN product_variant pv 
+            ON p.product_id = pv.product_id
+            AND pv.is_active = 1
+        WHERE p.is_deleted = 0
+          AND p.product_name LIKE :search_name
+        ORDER BY p.product_id DESC, pv.volume ASC
+    ";
 
         $stmt = $db->prepare($sql);
-        $stmt->execute(['search_name' => "%$search_name%"]);
+        $stmt->execute([
+            'search_name' => "%$search_name%"
+        ]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($results)) return [];
+
+        $variantIds = array_unique(array_column($results, 'variant_id'));
+        $placeholders = str_repeat('?,', count($variantIds) - 1) . '?';
+
+        $sqlBatch = "
+        SELECT batch_id, variant_id, quantity, expiration_date
+        FROM product_batch
+        WHERE variant_id IN ($placeholders) AND quantity > 0
+        ORDER BY expiration_date ASC, batch_id ASC
+    ";
+
+        $stmtBatch = $db->prepare($sqlBatch);
+        $stmtBatch->execute(array_values($variantIds));
+        $allBatches = $stmtBatch->fetchAll(PDO::FETCH_ASSOC);
+
+        $bestBatches = [];
+        foreach ($allBatches as $batch) {
+            if (!isset($bestBatches[$batch['variant_id']])) {
+                $bestBatches[$batch['variant_id']] = $batch;
+            }
+        }
+
+        foreach ($results as &$row) {
+            $vId = $row['variant_id'];
+            if (isset($bestBatches[$vId])) {
+                $row['batch_id'] = $bestBatches[$vId]['batch_id'];
+                $row['batch_quantity'] = $bestBatches[$vId]['quantity'];
+                $row['batch_expiration'] = $bestBatches[$vId]['expiration_date'];
+            } else {
+                $row['batch_id'] = null;
+                $row['batch_quantity'] = 0;
+                $row['batch_expiration'] = null;
+            }
+        }
+
+        return $results;
     }
+
 
     /* =====================================================
      * 2. DETAIL – CHI TIẾT SẢN PHẨM
