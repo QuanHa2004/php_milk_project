@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useCart from "../../context/cart-context"; // Đảm bảo đường dẫn import đúng với dự án của bạn
+import useCart from "../../context/cart-context";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,11 +13,13 @@ export default function Login() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State để xử lý ẩn/hiện mật khẩu
+  const [showPassword, setShowPassword] = useState(false);
+
+  // State hiển thị modal khóa tài khoản
+  const [showLockModal, setShowLockModal] = useState(false);
 
   // --- LOGIC HANDLERS ---
 
-  // Cập nhật giá trị input
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -25,7 +27,6 @@ export default function Login() {
     });
   };
 
-  // Xử lý đăng nhập thường
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,7 +41,17 @@ export default function Login() {
         }),
       });
 
-      if (!res.ok) throw new Error("Sai email hoặc mật khẩu");
+      // --- XỬ LÝ TÀI KHOẢN BỊ KHÓA (403) ---
+      if (res.status === 403) {
+        setShowLockModal(true); // Hiện popup
+        setLoading(false);      // Tắt loading
+        return;                 // Dừng xử lý
+      }
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Sai email hoặc mật khẩu");
+      }
 
       const data = await res.json();
 
@@ -65,7 +76,10 @@ export default function Login() {
     } catch (err) {
       alert(err.message);
     } finally {
-      setLoading(false);
+      // Chỉ tắt loading nếu không phải trường hợp 403 (vì 403 đã tắt ở trên)
+      if (!showLockModal) {
+        setLoading(false);
+      }
     }
   };
 
@@ -78,6 +92,13 @@ export default function Login() {
   useEffect(() => {
     const checkSocialLogin = async () => {
       const socialToken = searchParams.get('social_token');
+      const errorParam = searchParams.get('error');
+
+      if (errorParam === '403') {
+        setShowLockModal(true);
+        window.history.replaceState({}, document.title, "/login");
+        return;
+      }
 
       if (socialToken) {
         localStorage.setItem('access_token', socialToken);
@@ -95,6 +116,13 @@ export default function Login() {
           if (!res.ok) throw new Error("Không thể lấy thông tin người dùng");
 
           const userData = await res.json();
+
+          if (userData.is_deleted === 1) {
+            setShowLockModal(true);
+            localStorage.clear();
+            return;
+          }
+
           localStorage.setItem("role_id", userData.role_id);
 
           if (userData.role_id === 1) {
@@ -192,8 +220,8 @@ export default function Login() {
           </div>
 
           <div className="flex justify-end -mt-2">
-            <span onClick={()=>{navigate('/forgot-password')}} 
-            className="text-sm font-semibold text-[#1a3c7e] hover:text-[#15326d] hover:underline cursor-pointer transition-colors">
+            <span onClick={() => { navigate('/forgot-password') }}
+              className="text-sm font-semibold text-[#1a3c7e] hover:text-[#15326d] hover:underline cursor-pointer transition-colors">
               Quên mật khẩu?
             </span>
           </div>
@@ -218,7 +246,7 @@ export default function Login() {
           <div className="flex flex-col gap-3">
             <button
               type="button"
-              onClick={handleGoogleLogin} // Gắn sự kiện login Google
+              onClick={handleGoogleLogin}
               className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-gray-700 transition-all hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 font-semibold"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -237,13 +265,41 @@ export default function Login() {
             Chưa có tài khoản?{" "}
             <span
               className="font-bold text-[#1a3c7e] hover:underline cursor-pointer transition-colors"
-              onClick={() => navigate('/registration')} 
+              onClick={() => navigate('/registration')}
             >
               Đăng ký ngay
             </span>
           </p>
         </div>
       </div>
+
+      {/* --- POPUP THÔNG BÁO TÀI KHOẢN BỊ KHÓA --- */}
+      {showLockModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl p-6 w-[360px] shadow-xl text-center">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-red-600 text-2xl">
+                lock
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-[#1a3c7e] mb-2">
+              Tài khoản bị khóa
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên hoặc bộ phận hỗ trợ để biết thêm chi tiết.
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowLockModal(false)}
+                className="w-full px-4 py-2.5 rounded-xl bg-[#1a3c7e] text-white font-bold hover:bg-[#15326d] transition-colors"
+              >
+                Đã hiểu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

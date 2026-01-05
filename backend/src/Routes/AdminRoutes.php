@@ -93,6 +93,11 @@ if ($uri === "/admin/products/add" && $method === "POST") {
     exit;
 }
 
+if ($uri === "/admin/variants/add" && $method === "POST") {
+    $productAdmin->addVariant(json_decode(file_get_contents('php://input'), true));
+    exit;
+}
+
 if ($uri === "/admin/manufacturers/add" && $method === "POST") {
     $manufacturerAdmin->addManufacturer(json_decode(file_get_contents('php://input'), true));
     exit;

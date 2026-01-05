@@ -25,22 +25,6 @@ export default function OrderManagement() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-end gap-4 mb-6">
-                <label className="flex flex-col min-w-40 h-11 w-full max-w-lg">
-                  <div className="flex w-full flex-1 items-stretch rounded-xl h-full bg-white border border-gray-200 shadow-sm hover:border-blue-300 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-[#1a3c7e] overflow-hidden">
-                    
-                    <div className="text-gray-400 flex items-center justify-center pl-4">
-                      <span className="material-symbols-outlined">search</span>
-                    </div>
-                    
-                    <input
-                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#333] focus:outline-0 border-none bg-transparent h-full placeholder:text-gray-400 px-3 text-sm font-medium leading-normal"
-                      placeholder="Tìm theo mã đơn, tên khách hàng..."
-                    />
-                  </div>
-                </label>
-              </div>
-
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <OrderList />
               </div>

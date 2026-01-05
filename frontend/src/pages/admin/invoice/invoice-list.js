@@ -78,7 +78,7 @@ export default function InvoiceList() {
                                     </td>
 
                                     <td className="px-6 py-4 text-sm font-bold text-[#d32f2f]">
-                                        {Number(invoice.total_amount).toLocaleString("vi-VN")}
+                                        {Number(invoice.total_amount/100).toLocaleString("vi-VN")}
                                     </td>
 
                                     <td className="px-6 py-4 text-sm text-gray-600">

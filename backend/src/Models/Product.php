@@ -567,4 +567,53 @@ class Product
             throw $e;
         }
     }
+
+    public static function createVariant($data)
+    {
+        $db = Connection::get();
+
+        $productId = $data['product_id'];
+        $volume = $data['volume'] ?? '';
+        $packagingType = $data['packaging_type'] ?? '';
+
+        if (!empty($volume) && !empty($packagingType)) {
+            $stmtCheck = $db->prepare("
+            SELECT COUNT(*) 
+            FROM product_variant 
+            WHERE product_id = ? 
+            AND volume = ? 
+            AND packaging_type = ?
+        ");
+
+            $stmtCheck->execute([$productId, $volume, $packagingType]);
+            $exists = $stmtCheck->fetchColumn();
+
+            if ($exists > 0) {
+                throw new Exception("Biến thể với dung tích '$volume' và quy cách '$packagingType' đã tồn tại cho sản phẩm này!", 409);
+            }
+        }
+
+        try {
+            $stmt = $db->prepare("
+            INSERT INTO product_variant 
+            (product_id, variant_name, brand_name, volume, packaging_type, price, stock_quantity, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+            $stmt->execute([
+                $productId,
+                $data['variant_name'],
+                $data['brand_name'] ?? null,
+                $volume,      
+                $packagingType, 
+                $data['price'],
+                $data['stock_quantity'] ?? 0,
+                1 
+            ]);
+
+            return $db->lastInsertId();
+        } catch (Exception $e) {
+            throw new Exception("Lỗi cơ sở dữ liệu: " . $e->getMessage());
+        }
+    }
 }

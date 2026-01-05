@@ -8,6 +8,7 @@ import AddManufacturer from '../pages/admin/manufacturer/add-manufacturer';
 import ManufacturerManagement from '../pages/admin/manufacturer/manufacturer-management';
 import Order from '../pages/admin/order/order-management';
 import AddProduct from '../pages/admin/product/add-product';
+import AddVariant from '../pages/admin/product/add-variant';
 import ProductManagement from '../pages/admin/product/product-management';
 import CreatePromotion from '../pages/admin/promotion/create-promotion';
 import PromotionManagement from '../pages/admin/promotion/promotion-management';
@@ -52,6 +53,7 @@ export default function AppRoutes() {
         <Route path="/admin/supplier" element={<SupplierManagement />} />
         <Route path="/admin/add-category" element={<AddCategory />} />
         <Route path="/admin/add-product" element={<AddProduct />} />
+        <Route path="/admin/add-variant" element={<AddVariant />} />
         <Route path="/admin/create-promotion" element={<CreatePromotion />} />
         <Route path="/admin/add-invoice" element={<AddInvoice />} />
         <Route path="/admin/add-manufacturer" element={<AddManufacturer />} />

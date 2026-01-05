@@ -38,25 +38,6 @@ export default function PromotionManagement() {
                 </button>
               </div>
 
-              <div className="mb-6 w-full max-w-sm">
-                <label className="flex flex-col min-w-40 h-11 w-full">
-                  <div className="flex w-full flex-1 items-stretch rounded-xl h-full bg-white border border-gray-200 shadow-sm hover:border-blue-300 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-[#1a3c7e] overflow-hidden">
-                    
-                    <div className="text-gray-400 flex items-center justify-center pl-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      </svg>
-                    </div>
-                    
-                    <input
-                      className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#333] focus:outline-0 border-none bg-transparent h-full placeholder:text-gray-400 px-3 text-sm font-medium leading-normal"
-                      placeholder="Tìm kiếm mã code..."
-                    />
-                  </div>
-                </label>
-              </div>
-
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
                 <PromotionList />
               </div>

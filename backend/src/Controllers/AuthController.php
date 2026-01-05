@@ -118,6 +118,10 @@ class AuthController
             Response::json(['error' => 'Email không tồn tại'], 401);
         }
 
+        if ($user['is_deleted'] == 1) {
+            Response::json(['error' => 'Tài khoản của bạn đã bị khóa.'], 403);
+        }
+
         // Không cho login nếu là tài khoản Google
         if (empty($user['password_hash'])) {
             Response::json(['error' => 'Tài khoản này được tạo bằng Google. Vui lòng đăng nhập bằng Google.'], 400);

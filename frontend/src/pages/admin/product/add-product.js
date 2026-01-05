@@ -15,7 +15,7 @@ export default function AddProduct() {
     manufacturer_id: "",
     image_url: "",
     description: "",
-    is_hot: 0
+    is_hot: 0 // Giá trị mặc định là 0 (Không hot)
   });
 
   const [detailData, setDetailData] = useState({
@@ -57,6 +57,14 @@ export default function AddProduct() {
 
   const handleChange = (setter) => (e) =>
     setter(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+  // Hàm xử lý riêng cho Checkbox is_hot
+  const handleCheckboxChange = (e) => {
+    setProductData(prev => ({
+      ...prev,
+      is_hot: e.target.checked ? 1 : 0
+    }));
+  };
 
   const handleDynamicChange = (index, list, setter, field, value) => {
     const updated = [...list];
@@ -122,9 +130,21 @@ export default function AddProduct() {
         </div>
 
         <main className="p-8 w-full max-w-6xl mx-auto">
-          <div className="flex flex-col gap-1 mb-8">
-            <p className="text-[#1a3c7e] text-3xl font-black tracking-tight uppercase">Thêm sản phẩm mới</p>
-            <p className="text-gray-500 text-sm">Nhập thông tin chi tiết đầy đủ cho sản phẩm sữa.</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <p className="text-[#1a3c7e] text-3xl font-black tracking-tight uppercase">Thêm sản phẩm mới</p>
+              <p className="text-gray-500 text-sm">Nhập thông tin chi tiết đầy đủ cho sản phẩm sữa.</p>
+            </div>
+
+            <button
+              onClick={() => navigate('/admin/add-variant')}
+              className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#1a3c7e] text-white text-sm font-bold tracking-wide hover:bg-[#15326d] hover:-translate-y-0.5 transition-all shadow-md shadow-blue-100"
+            >
+              <span className="truncate flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Thêm biến thể mới
+              </span>
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -154,8 +174,8 @@ export default function AddProduct() {
                 </label>
 
                 <label>
-                  <span className={labelClass}>Nhà sản xuất</span>
-                  <select name="manufacturer_id" value={productData.manufacturer_id} onChange={handleChange(setProductData)} className={inputClass}>
+                  <span className={labelClass}>Nhà sản xuất <span className="text-red-500">*</span></span>
+                  <select name="manufacturer_id" value={productData.manufacturer_id} onChange={handleChange(setProductData)} className={inputClass} required>
                     <option value="">-- Chọn nhà sản xuất --</option>
                     {manufacturers.map(m => (
                       <option key={m.manufacturer_id} value={m.manufacturer_id}>{m.manufacturer_name}</option>
@@ -163,20 +183,21 @@ export default function AddProduct() {
                   </select>
                 </label>
 
-                <label>
-                  <span className={labelClass}>Giá bán (VNĐ)</span>
-                  <input type="number" name="price" value={productData.price} onChange={handleChange(setProductData)} className={inputClass} />
-                </label>
-
-                <label>
-                  <span className={labelClass}>Số lượng kho</span>
-                  <input type="number" name="quantity" value={productData.quantity} onChange={handleChange(setProductData)} className={inputClass} />
-                </label>
-
-                <label>
-                  <span className={labelClass}>Giảm giá (%)</span>
-                  <input type="number" name="discount_percent" value={productData.discount_percent} onChange={handleChange(setProductData)} className={inputClass} />
-                </label>
+                {/* --- CHECKBOX IS_HOT ĐƯỢC THÊM VÀO ĐÂY --- */}
+                <div className="flex items-end">
+                  <label className="flex items-center gap-3 cursor-pointer w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-[#1a3c7e] transition-all">
+                    <input
+                      type="checkbox"
+                      name="is_hot"
+                      checked={productData.is_hot === 1}
+                      onChange={handleCheckboxChange}
+                      className="w-5 h-5 text-[#1a3c7e] rounded border-gray-300 focus:ring-[#1a3c7e] cursor-pointer"
+                    />
+                    <span className="text-[#1a3c7e] text-sm font-bold uppercase tracking-wide select-none">
+                      Hot
+                    </span>
+                  </label>
+                </div>
 
                 <label className="lg:col-span-3">
                   <span className={labelClass}>Link hình ảnh</span>

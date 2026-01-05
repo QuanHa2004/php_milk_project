@@ -8,10 +8,10 @@ use Controllers\AuthController;
 class SocialAuthController
 {
 
-     /* ============================================
+    /* ============================================
          1. CHUYỂN HƯỚNG NGƯỜI DÙNG SANG GOOGLE LOGIN
      ============================================ */
-     public function redirectToGoogle()
+    public function redirectToGoogle()
     {
 
         if (!defined('GOOGLE_CLIENT_ID')) {
@@ -32,10 +32,10 @@ class SocialAuthController
     }
 
 
-     /* ============================================
+    /* ============================================
          2. GOOGLE CALLBACK – NHẬN CODE & LẤY USER INFO
      ============================================ */
-     public function handleGoogleCallback()
+    public function handleGoogleCallback()
     {
 
         // Không có code → lỗi hoặc người dùng hủy
@@ -95,13 +95,18 @@ class SocialAuthController
     }
 
 
-     /* ============================================
+    /* ============================================
          3. LOGIC CHUNG: LƯU USER + TẠO JWT TOKEN
      ============================================ */
-     private function processSocialLogin($email, $name, $providerField, $socialId, $avatar = null)
+    private function processSocialLogin($email, $name, $providerField, $socialId, $avatar = null)
     {
 
         $user = User::findByEmail($email);
+
+        if ($user && (int)$user['is_deleted'] === 1) {
+            header("Location: http://localhost:3000/login?error=403");
+            exit;
+        }
 
         if ($user) {
             // Nếu user có nhưng chưa lưu google_id → cập nhật

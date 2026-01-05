@@ -213,14 +213,6 @@ export default function Registration() {
               />
             </div>
 
-            {/* Điều khoản */}
-            <div className="flex items-start gap-3 mt-2">
-              <input type="checkbox" id="terms" className="mt-1 w-4 h-4 accent-[#1a3c7e]" />
-              <label htmlFor="terms" className="text-sm text-gray-500 leading-tight">
-                Tôi đồng ý với <span className="text-[#1a3c7e] font-semibold cursor-pointer hover:underline">Điều khoản dịch vụ</span> và <span className="text-[#1a3c7e] font-semibold cursor-pointer hover:underline">Chính sách bảo mật</span>
-              </label>
-            </div>
-
             {/* Hiển thị thông báo lỗi/thành công */}
             {message && (
               <div className={`p-3 rounded-lg text-sm text-center font-medium ${message.includes("thành công") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
