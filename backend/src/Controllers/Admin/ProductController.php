@@ -28,16 +28,21 @@ class ProductController
     {
         try {
             if (!$data) {
-                Response::json([
-                    'message' => 'Dữ liệu gửi lên không hợp lệ'
-                ], 400);
+                Response::json(['message' => 'Dữ liệu gửi lên không hợp lệ'], 400);
                 return;
             }
 
             if (empty($data['product_name']) || empty($data['category_id'])) {
+                Response::json(['message' => 'Tên sản phẩm và danh mục là bắt buộc'], 422);
+                return;
+            }
+
+            $name = trim($data['product_name']);
+
+            if (Product::existsByName($name)) {
                 Response::json([
-                    'message' => 'Tên sản phẩm và danh mục là bắt buộc'
-                ], 422);
+                    'message' => 'Tên sản phẩm đã tồn tại trong danh mục này'
+                ], 409);
                 return;
             }
 
@@ -54,6 +59,7 @@ class ProductController
             ], 500);
         }
     }
+
 
     public function addVariant($data)
     {

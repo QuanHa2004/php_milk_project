@@ -105,21 +105,29 @@ export default function AddProduct() {
       const res = await fetch("http://localhost:8000/admin/products/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Thêm sản phẩm thành công!");
+        alert(data.message || "Thêm sản phẩm thành công!");
         navigate("/admin/product");
       } else {
-        const err = await res.json();
-        alert("Lỗi: " + (err.error || "Không xác định"));
+        if (res.status === 409) {
+          alert(data.message); // trùng tên
+        } else if (res.status === 422) {
+          alert(data.message);
+        } else {
+          alert("Lỗi hệ thống, vui lòng thử lại");
+        }
       }
     } catch {
       alert("Lỗi kết nối server");
     } finally {
       setIsSubmitting(false);
     }
+
   };
 
   return (

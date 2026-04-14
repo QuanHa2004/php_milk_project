@@ -34,6 +34,9 @@ $order      = new Controllers\Customer\OrderController();
 $payment    = new Controllers\Customer\PaymentController();
 $review     = new Controllers\Customer\ReviewController();
 $promotion  = new Controllers\Customer\PromotionController();
+$chatbot    = new Controllers\Customer\ChatbotController();
+
+
 
 
 $orderAdmin        = new Controllers\Admin\OrderController();

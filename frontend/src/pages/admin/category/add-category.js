@@ -9,7 +9,11 @@ export default function AddCategory() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!categoryName.trim()) return;
+
+    if (!categoryName.trim()) {
+      alert("Vui lòng nhập tên danh mục");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -20,18 +24,28 @@ export default function AddCategory() {
         body: JSON.stringify({ category_name: categoryName }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Them thanh cong!");
+        alert(data.message || "Thêm thành công!");
         navigate("/admin/category");
       } else {
-        alert("Có lỗi xảy ra!");
+        if (res.status === 409) {
+          alert(data.error);
+        } else if (res.status === 400) {
+          alert(data.error);
+        } else {
+          alert("Lỗi hệ thống, vui lòng thử lại!");
+        }
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("Không thể kết nối tới server");
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="relative flex min-h-screen bg-[#f8f9fa] font-sans">

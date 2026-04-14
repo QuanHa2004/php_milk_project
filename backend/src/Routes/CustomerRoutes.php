@@ -146,3 +146,8 @@ if ($uri === "/promotions" && $method === "GET") {
     $promotion->getPromotionList();
     exit;
 }
+
+if ($uri === '/api/chatbot/consult' && $method === "POST") {
+    $chatbot->consult(json_decode(file_get_contents('php://input'), true));
+    exit;
+}

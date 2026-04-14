@@ -7,7 +7,8 @@
             "Models\\": "src/Models/",
             "Helpers\\": "src/Helpers/",
             "Routes\\": "src/Routes/",
-            "Database\\": "src/Database/"
+            "Database\\": "src/Database/",
+            "Services\\": "src/Services/"
         }
     },
     "require": {

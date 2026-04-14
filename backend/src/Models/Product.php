@@ -604,16 +604,32 @@ class Product
                 $productId,
                 $data['variant_name'],
                 $data['brand_name'] ?? null,
-                $volume,      
-                $packagingType, 
+                $volume,
+                $packagingType,
                 $data['price'],
                 $data['stock_quantity'] ?? 0,
-                1 
+                1
             ]);
 
             return $db->lastInsertId();
         } catch (Exception $e) {
             throw new Exception("Lỗi cơ sở dữ liệu: " . $e->getMessage());
         }
+    }
+
+    public static function existsByName($name)
+    {
+        $db = Connection::get();
+
+        $sql = "SELECT 1 FROM product 
+            WHERE product_name = :name  
+            LIMIT 1";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':name' => $name,
+        ]);
+
+        return $stmt->fetchColumn() !== false;
     }
 }
